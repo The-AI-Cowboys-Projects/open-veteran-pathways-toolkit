@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plain-English AI Tutor — Open Veteran Pathways Toolkit</title>
+  <style>
+    :root { --navy: #0A0A0E; --teal: #12A594; --magenta: #DD368A; --paper: #F7F5F0; }
+    body { font-family: system-ui, -apple-system, sans-serif; margin: 0; background: var(--paper); color: var(--navy); line-height: 1.5; }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 2rem 1.25rem; }
+    h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
+    .sub { color: #444; margin-bottom: 1.5rem; }
+    input, button { font: inherit; }
+    .search { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+    input { flex: 1; padding: 0.65rem 0.75rem; border: 1px solid #ccc; border-radius: 6px; }
+    button { background: var(--magenta); color: white; border: none; padding: 0.65rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; }
+    button:hover { background: #c02d78; }
+    .card { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; }
+    .card h3 { margin: 0 0 0.35rem 0; }
+    .card p { margin: 0; color: #333; }
+    .term { font-weight: 600; color: var(--teal); }
+    footer { margin-top: 2rem; font-size: 0.8rem; color: #666; }
+    a { color: var(--teal); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Plain-English AI Tutor</h1>
+    <p class="sub">Offline tutor grounded in the Foundation’s free AI Guide and Glossary. Search terms or browse. Everything runs on your device.</p>
+
+    <div class="search">
+      <input id="q" placeholder="Search: RAG, prompt, agent, bias, fine-tuning..." autocomplete="off">
+      <button id="go">Search</button>
+    </div>
+
+    <div id="results"></div>
+
+    <footer>
+      Open Veteran Pathways Toolkit · The AI Cowboys Foundation<br>
+      MIT License · Offline · Private by default<br>
+      Full content: <a href="https://theaicowboysfoundation.org/learn/ai-guide">AI Guide</a> · <a href="https://theaicowboysfoundation.org/learn/ai-glossary">Glossary</a>
+    </footer>
+  </div>
+
+  <script>
+    // Compact offline knowledge base drawn from Foundation free content (plain-English).
+    const KB = [
+      { term: "RAG", title: "Retrieval-Augmented Generation", body: "RAG lets an AI look up information in your documents before it answers. Instead of relying only on what it memorized during training, it retrieves relevant passages and uses them to ground the response. Useful when you want answers based on your own policies, manuals, or notes." },
+      { term: "Prompt", title: "Prompt", body: "The instructions or question you give an AI. Clear, specific prompts with context and examples usually produce better results. Think of it as writing a good task order: state the goal, the constraints, and the format you want back." },
+      { term: "Agent", title: "AI Agent", body: "An AI that can take actions, not just answer questions. It might search files, call tools, or follow a multi-step plan. Agents are useful for workflows, but they need clear boundaries and human oversight, especially in official or sensitive settings." },
+      { term: "Fine-tuning", title: "Fine-tuning", body: "Additional training on a specialized dataset so a model performs better on a particular task or domain. It can improve accuracy for your use case, but it requires data, compute, and care to avoid overfitting or introducing new biases." },
+      { term: "Bias", title: "Bias in AI", body: "Systematic errors that can appear in AI outputs because of the data it was trained on or how it was designed. Responsible use includes checking outputs for fairness, especially when decisions affect people’s opportunities, benefits, or safety." },
+      { term: "Hallucination", title: "Hallucination", body: "When an AI confidently states something that is not true or not supported by its sources. Common with general models. Mitigation includes using RAG with trusted documents, asking for citations, and verifying important claims." },
+      { term: "Token", title: "Token", body: "The basic unit of text an AI model processes (roughly pieces of words). Context limits and pricing are often measured in tokens. Longer conversations or documents use more tokens." },
+      { term: "Responsible AI", title: "Responsible AI", body: "Using AI in ways that are transparent, fair, secure, and aligned with human oversight. Includes clear policies, human review for high-stakes decisions, privacy protection, and documentation of how the system works." }
+    ];
+
+    const results = document.getElementById('results');
+    const input = document.getElementById('q');
+    const btn = document.getElementById('go');
+
+    function render(items) {
+      if (!items.length) {
+        results.innerHTML = `<div class="card"><p>No exact matches. Try RAG, prompt, agent, bias, fine-tuning, or hallucination. Full guide is on the Foundation site.</p></div>`;
+        return;
+      }
+      results.innerHTML = items.map(item => `
+        <div class="card">
+          <h3><span class="term">${item.term}</span> — ${item.title}</h3>
+          <p>${item.body}</p>
+        </div>
+      `).join('');
+    }
+
+    function search() {
+      const q = input.value.trim().toLowerCase();
+      if (!q) { render(KB); return; }
+      const filtered = KB.filter(item =>
+        item.term.toLowerCase().includes(q) ||
+        item.title.toLowerCase().includes(q) ||
+        item.body.toLowerCase().includes(q)
+      );
+      render(filtered);
+    }
+
+    btn.addEventListener('click', search);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') search(); });
+
+    // Show all on load
+    render(KB);
+  </script>
+</body>
+</html>
