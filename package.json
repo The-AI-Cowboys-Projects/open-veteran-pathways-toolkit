@@ -1,7 +1,9 @@
 {
   "name": "open-veteran-pathways-toolkit",
   "private": true,
-  "description": "Offline tools for veterans, military families, and older adults.",
+  "description": "Built by The AI Cowboys. Offline tools for veterans, military families, and older adults from The AI Cowboys Foundation, a veteran-owned AI lab in San Antonio (www.theaicowboysfoundation.org).",
+  "author": "The AI Cowboys Foundation",
+  "homepage": "https://www.theaicowboysfoundation.org",
   "scripts": {
     "verify": "node scripts/verify.mjs",
     "serve": "python3 scripts/serve.py",
@@ -14,6 +16,6 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@playwright/test": "^1.49.1"
+    "@playwright/test": "^1.65.0"
   }
 }

@@ -383,7 +383,7 @@
     if (!record.onet || !record.onet.length) lines.push("- No O*NET-SOC code is listed on this DMDC record.");
     if (curated && curated.length) {
       lines.push("");
-      lines.push("Debriefed dictionary suggestions (not an official eligibility finding):");
+      lines.push("Military-to-civilian phrase dictionary suggestions (not an official eligibility finding):");
       curated.forEach(function (item) {
         if (item.civilian && item.civilian.length) lines.push("- Civilian titles: " + item.civilian.join("; "));
         if (item.skills && item.skills.length) lines.push("- Skills noted in the dictionary: " + item.skills.join("; "));

@@ -1,11 +1,11 @@
 /* Offline cache for the toolkit. Paths are relative to this file so a subpath host works. */
-var CACHE = "ovpt-static-v2";
+var CACHE = "ovpt-static-v3";
 var PRECACHE = [
   "index.html",
   "manifest.webmanifest",
   "LICENSE",
   "README.md",
-  "THIRD_PARTY_NOTICES.md",
+  "THIRD_PARTY_LICENSES.md",
   "shared/styles.css",
   "shared/shell.js",
   "icons/favicon-32.png",
@@ -22,7 +22,6 @@ var PRECACHE = [
   "career-pathway-translator/data/occupations.js",
   "career-pathway-translator/data/phrases.js",
   "career-pathway-translator/vendor/debriefed/LICENSE",
-  "career-pathway-translator/vendor/debriefed/NOTICE",
   "career-pathway-translator/vendor/debriefed/manifest.json",
   "scam-guardian/index.html",
   "scam-guardian/styles.css",
@@ -36,9 +35,7 @@ var PRECACHE = [
   "scam-guardian/vendor/tesseract/core/tesseract-core-lstm.wasm.js",
   "scam-guardian/vendor/tesseract/core/tesseract-core-simd-lstm.wasm.js",
   "scam-guardian/vendor/tesseract/core/tesseract-core-relaxedsimd-lstm.wasm.js",
-  "scam-guardian/vendor/tesseract/NOTICE",
   "scam-guardian/vendor/scram/LICENSE",
-  "scam-guardian/vendor/scram/NOTICE",
   "shared/local-model.js",
   "ai-tutor/index.html",
   "ai-tutor/styles.css",

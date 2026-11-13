@@ -126,12 +126,14 @@
 
   function watch(reg) {
     registration = reg;
+    var pendingWorker = null;
+    updateBtn.addEventListener("click", function () {
+      if (pendingWorker) pendingWorker.postMessage({ type: "skip-waiting" });
+    });
     function offer(worker) {
       if (!worker || !navigator.serviceWorker.controller) return;
+      pendingWorker = worker;
       banner.hidden = false;
-      updateBtn.onclick = function () {
-        worker.postMessage({ type: "skip-waiting" });
-      };
     }
     if (reg.waiting) offer(reg.waiting);
     reg.addEventListener("updatefound", function () {

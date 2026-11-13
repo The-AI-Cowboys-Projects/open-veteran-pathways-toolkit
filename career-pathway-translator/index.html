@@ -8,7 +8,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Pathways">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://huggingface.co https://cdn-lfs.huggingface.co https://*.hf.co https://*.xethub.hf.co; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="description" content="Built by The AI Cowboys. Look up a military occupation code and civilian wording on this device. Nothing you type is uploaded.">
   <title>Career Pathway Translator</title>
   <link rel="icon" href="../icons/favicon-32.png" type="image/png">
   <link rel="apple-touch-icon" href="../icons/icon-180.png">
@@ -66,7 +67,7 @@
     </div>
     <section class="panel">
       <h2>Translate a bullet or résumé line</h2>
-      <p>Paste unclassified duty wording. The page substitutes phrases from the Debriefed dictionary stored with this tool. It does not invent numbers, duties, or a job offer. A related Foundation page, the <a href="https://www.theaicowboysfoundation.org/learn/mos-to-ceo" rel="noopener noreferrer">MOS to CEO Translator</a>, is separate. Its source is not in this repository, and this page does not copy it.</p>
+      <p>Paste unclassified duty wording. The page substitutes phrases from the military-to-civilian phrase dictionary stored with this tool. It does not invent numbers, duties, or a job offer. A related Foundation page, the <a href="https://www.theaicowboysfoundation.org/learn/mos-to-ceo" rel="noopener noreferrer">MOS to CEO Translator</a>, is separate. Its source is not in this repository, and this page does not copy it.</p>
       <form id="phrase-form">
         <label for="phrase-text">Bullet points or a résumé line</label>
         <textarea id="phrase-text" placeholder="Example: Briefed flag officers and supervised personnel."></textarea>
@@ -78,7 +79,7 @@
     </section>
     <section class="panel">
       <h2>Pay grade wording</h2>
-      <p>A separate Debriefed table suggests civilian scope language for pay grades. It does not convert a rank into a civilian job title.</p>
+      <p>A separate table in the military-to-civilian phrase dictionary suggests civilian scope language for pay grades. It does not convert a rank into a civilian job title.</p>
       <form id="rank-form">
         <div class="row">
           <div>
@@ -100,7 +101,8 @@
       <h2>What this file contains</h2>
       <p id="about-counts">Counts appear when the local files finish loading.</p>
       <p>Military codes and O*NET-SOC links are from the Defense Manpower Data Center crosswalk distributed by the O*NET Resource Center. Occupation descriptions, skills, sample titles, and job-zone text are from the O*NET 31.0 Database by the U.S. Department of Labor, Employment and Training Administration, used under CC BY 4.0. This toolkit shortened the database to those fields and dropped rows that were not needed for this lookup. USDOL/ETA has not approved, endorsed, or tested these modifications. O*NET® is a trademark of USDOL/ETA.</p>
-      <p>Handbook links are from the BLS Occupational Outlook Handbook crosswalk. Resume phrases, curated civilian titles, jargon, acronyms, rank wording, action verbs, bullet examples, quantification templates, industry-framing examples, summary examples, and keyword lists are converted from Debriefed by Chris Simser, MIT License, commit 7d75063a4d816ab615cdfbe8868045490837f725. That project’s manifest reports 34,071 rows. This page ships the count shown above and does not ship the 24,248-row crosswalk file, because the DMDC file is the military source.</p>
+      <p>This page includes information from the O*NET 31.0 Database by the U.S. Department of Labor, Employment and Training Administration (USDOL/ETA). Used under the <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener noreferrer">CC BY 4.0 license</a>. O*NET® is a trademark of USDOL/ETA. The AI Cowboys Foundation has modified all or some of this information. USDOL/ETA has not approved, endorsed, or tested these modifications.</p>
+      <p>Handbook links are from the BLS Occupational Outlook Handbook crosswalk. Resume phrases, curated civilian titles, jargon, acronyms, rank wording, action verbs, bullet examples, quantification templates, industry-framing examples, summary examples, and keyword lists are in the military-to-civilian phrase dictionary stored with this page. This page ships the count shown above. It does not ship a second military crosswalk, because the DMDC file is the military source.</p>
       <p>Some official links point at military O*NET occupations, especially infantry codes in group 55. Those records describe the service job. Dictionary titles beside them are suggestions for a human to review. Additional skill identifiers, prefixes, Navy AQDs, and similar add-on codes are not in this offline file. Primary enlisted, warrant, and officer codes for the six branches are.</p>
       <p><button type="button" class="secondary" id="clear-history">Clear code history on this browser</button></p>
       <div id="history" aria-live="polite"></div>
@@ -108,7 +110,11 @@
   </main>
   <footer>
     <div class="wrap">
-      <p>The AI Cowboys Foundation is a Texas 501(c)(3) in San Antonio. This tool is not affiliated with, endorsed by, or part of the Department of Defense, the Department of Veterans Affairs, or any other government agency. Outputs are for human review. They are not legal, medical, financial, benefits, or employment advice. Never enter classified information, Controlled Unclassified Information (CUI), protected health information, Social Security numbers, or other sensitive personal information. Everything on this page runs in your browser. The page does not send your text to a server.</p>
+      <p class="built-by">Built by The AI Cowboys</p>
+      <p>The AI Cowboys Foundation, <a href="https://www.theaicowboysfoundation.org/" rel="noopener noreferrer">www.theaicowboysfoundation.org</a>, a veteran-owned AI lab in San Antonio. The Foundation is a Texas 501(c)(3).</p>
+      <p>This page includes information from the O*NET 31.0 Database by the U.S. Department of Labor, Employment and Training Administration (USDOL/ETA). Used under the <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener noreferrer">CC BY 4.0 license</a>. O*NET® is a trademark of USDOL/ETA. The AI Cowboys Foundation has modified all or some of this information. USDOL/ETA has not approved, endorsed, or tested these modifications.</p>
+      <p>This tool is not affiliated with, endorsed by, or part of the Department of Defense or the Department of Veterans Affairs. Outputs are for human review. They are not legal, medical, financial, benefits, or employment advice. Never enter classified information, Controlled Unclassified Information (CUI), protected health information (PHI), or sensitive personally identifiable information (SPII). Everything on this page runs in your browser. The page does not send your text to a server.</p>
+      <p>Third-party license notices: <a href="../THIRD_PARTY_LICENSES.md">THIRD_PARTY_LICENSES.md</a>.</p>
     </div>
   </footer>
   <script src="../shared/shell.js"></script>

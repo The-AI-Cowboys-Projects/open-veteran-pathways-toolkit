@@ -8,7 +8,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Pathways">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://huggingface.co https://cdn-lfs.huggingface.co https://*.hf.co https://*.xethub.hf.co; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="description" content="Built by The AI Cowboys. A separation checklist that stays in this browser. It is not a benefits decision.">
   <title>Transition Companion</title>
   <link rel="icon" href="../icons/favicon-32.png" type="image/png">
   <link rel="apple-touch-icon" href="../icons/icon-180.png">
@@ -67,7 +68,10 @@
   </main>
   <footer>
     <div class="wrap">
-      <p>The AI Cowboys Foundation is a Texas 501(c)(3) in San Antonio. This tool is not affiliated with, endorsed by, or part of the Department of Defense, the Department of Veterans Affairs, or any other government agency. Outputs are for human review. They are not legal, medical, financial, benefits, or employment advice. Never enter classified information, Controlled Unclassified Information (CUI), protected health information, Social Security numbers, or other sensitive personal information. Everything on this page runs in your browser. The page does not send your checklist to a server.</p>
+      <p class="built-by">Built by The AI Cowboys</p>
+      <p>The AI Cowboys Foundation, <a href="https://www.theaicowboysfoundation.org/" rel="noopener noreferrer">www.theaicowboysfoundation.org</a>, a veteran-owned AI lab in San Antonio. The Foundation is a Texas 501(c)(3).</p>
+      <p>This tool is not affiliated with, endorsed by, or part of the Department of Defense or the Department of Veterans Affairs. Outputs are for human review. They are not legal, medical, financial, benefits, or employment advice. Never enter classified information, Controlled Unclassified Information (CUI), protected health information (PHI), or sensitive personally identifiable information (SPII). Everything on this page runs in your browser. The page does not send your checklist to a server.</p>
+      <p>Third-party license notices: <a href="../THIRD_PARTY_LICENSES.md">THIRD_PARTY_LICENSES.md</a>.</p>
     </div>
   </footer>
   <script src="../shared/shell.js"></script>

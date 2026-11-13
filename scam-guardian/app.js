@@ -97,9 +97,9 @@
       output.append(note);
     }
     const channel = document.getElementById("channel");
-    const rubric = engine.scramRubric(document.getElementById("text").value, channel ? channel.value : "messaging");
-    const rubricBox = h("div", { class: "callout", id: "scram-rubric" });
-    rubricBox.append(h("h3", { text: "Scram rubric suggestion" }));
+    const rubric = engine.messageRubric(document.getElementById("text").value, channel ? channel.value : "messaging");
+    const rubricBox = h("div", { class: "callout", id: "message-rubric" });
+    rubricBox.append(h("h3", { text: "Message rubric suggestion" }));
     rubricBox.append(h("p", { text: rubric.note }));
     rubricBox.append(h("p", { text: "Score " + rubric.points + " (the prompt’s cutoff is " + rubric.threshold + "). Label from that rule: " + rubric.label + ". This is not a measured probability and it does not change the concern level above." }));
     if (!rubric.hits.length) rubricBox.append(h("p", { text: "None of the rubric lines matched." }));
@@ -150,7 +150,7 @@
       }
       suggestion.append(h("p", { class: "state state-loading", text: "The model is reading the text on this device." }));
       const channel = document.getElementById("channel");
-      localGenerate(engine.scramPrompt(channel ? channel.value : "messaging", text)).then(function (raw) {
+      localGenerate(engine.messagePrompt(channel ? channel.value : "messaging", text)).then(function (raw) {
         const parsed = engine.parseModelSuggestion(raw);
         suggestion.replaceChildren();
         const box = h("div", { class: "warning" });

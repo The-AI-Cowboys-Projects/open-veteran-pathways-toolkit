@@ -1,5 +1,7 @@
 # Agent security practices in this toolkit
 
+**Built by The AI Cowboys.** The AI Cowboys Foundation, [www.theaicowboysfoundation.org](https://www.theaicowboysfoundation.org), a veteran-owned AI lab in San Antonio.
+
 Pendleton, M., et al. (2026). Agent Security Framework, Version 1.0. The AI Cowboys. CC BY 4.0. https://doi.org/10.5281/zenodo.19561360
 
 This note says how the Plain-English AI Tutor and the Transition Companion apply least-agency defaults. It is not a certification and not a claim that a grant was awarded.

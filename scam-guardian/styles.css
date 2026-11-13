@@ -441,6 +441,15 @@ footer a { color: var(--teal); }
 
 footer p { color: #f2f2f2; }
 
+.built-by {
+  display: inline-block;
+  margin: 0 0 0.6rem;
+  padding: 0.2rem 0.55rem;
+  background: #3DD8C8;
+  color: #111111;
+  font-weight: 700;
+}
+
 .muted { color: var(--muted); }
 
 .stack > * { margin-top: 0; }

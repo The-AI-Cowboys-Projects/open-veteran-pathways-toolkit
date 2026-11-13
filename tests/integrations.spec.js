@@ -29,7 +29,7 @@ test("scam rules and rubric work with the model absent and make no model request
   await page.locator("#text").fill("Your benefits are suspended. Call immediately and pay with a gift card.");
   await page.locator("#form button[type=submit]").click();
   await expect(page.locator("#output")).toContainText("High concern");
-  await expect(page.locator("#scram-rubric")).toContainText("scam");
+  await expect(page.locator("#message-rubric")).toContainText("scam");
   await page.locator("#model-ask").click();
   await expect(page.locator("#model-suggestion")).toContainText("not on this device");
   expect(hosts.some((host) => host.indexOf("huggingface") !== -1)).toBe(false);

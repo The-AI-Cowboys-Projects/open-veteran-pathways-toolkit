@@ -282,45 +282,16 @@ def debriefed_counts(bundle, curated):
     return shipped, not_shipped
 
 
-def write_debriefed_notice() -> None:
+def write_phrase_dictionary_license() -> None:
+    """Copy the upstream LICENSE next to the snapshot. Public notice text lives in THIRD_PARTY_LICENSES.md."""
     license_path = fetch(f"{DEBRIEFED_RAW}/LICENSE", CACHE / "debriefed" / "LICENSE")
     manifest_path = fetch(f"{DEBRIEFED_RAW}/public-data/manifest.json", CACHE / "debriefed" / "manifest.json")
     VENDOR.mkdir(parents=True, exist_ok=True)
     (VENDOR / "LICENSE").write_text(license_path.read_text(encoding="utf-8"), encoding="utf-8")
     (VENDOR / "manifest.json").write_text(manifest_path.read_text(encoding="utf-8"), encoding="utf-8")
-    (VENDOR / "NOTICE").write_text(
-        "\n".join(
-            [
-                "Debriefed dictionary extracts",
-                "",
-                "Source: https://github.com/csimser/debriefed",
-                f"Commit: {DEBRIEFED_SHA}",
-                f"Manifest: {DEBRIEFED_MANIFEST_VERSION}",
-                f"That manifest reports total_rows {DEBRIEFED_REPORTED_ROWS}.",
-                "License: MIT. Copyright (c) 2026 Chris Simser.",
-                "See LICENSE in this folder. The MIT license applies to Chris Simser's",
-                "dictionary software and phrasing. It does not relicense U.S. government",
-                "or O*NET data that may appear alongside it.",
-                "",
-                "The page uses a conversion of the public-data JSON in that commit:",
-                "phrase translations, evaluation phrases, jargon, acronyms, MOS notes,",
-                "ranks, soft skills, action verbs, resume-bullet examples, quantification",
-                "helpers, industry-framing examples, professional-summary examples, and",
-                "keyword lists. The conversion is career-pathway-translator/data/phrases.js.",
-                "manifest.json in this folder is the upstream row manifest, unmodified.",
-                "",
-                "Not converted into the page: onet_crosswalk.json (the DMDC file is the",
-                "military source), onet-occupations.json (O*NET 31.0 is used instead),",
-                "cover-letter and resume and LinkedIn templates, funding tables, and",
-                "gap recommendations that state costs and discounts this toolkit does",
-                "not verify. Occupation facts shown next to the dictionary come from",
-                "the DMDC crosswalk and the O*NET 31.0 Database, which keep their own",
-                "terms. See THIRD_PARTY_NOTICES.md.",
-                "",
-            ]
-        ),
-        encoding="utf-8",
-    )
+    notice = VENDOR / "NOTICE"
+    if notice.exists():
+        notice.unlink()
 
 
 def main() -> None:
@@ -438,7 +409,7 @@ def main() -> None:
 
     bundle = load_debriefed()
     curated, missing_codes = curated_from(bundle["curated_raw"], occupations)
-    write_debriefed_notice()
+    write_phrase_dictionary_license()
     shipped, not_shipped = debriefed_counts(bundle, curated)
 
     active = sum(1 for row in rows_out if row[5] == "A")
@@ -466,12 +437,12 @@ def main() -> None:
         "framing": len(bundle["framing"]),
         "summaries": len(bundle["summaries"]),
         "ats": len(bundle["ats"]),
-        "debriefedCommit": DEBRIEFED_SHA,
-        "debriefedManifestVersion": DEBRIEFED_MANIFEST_VERSION,
-        "debriefedReportedRows": DEBRIEFED_REPORTED_ROWS,
-        "debriefedShippedRows": sum(shipped.values()),
-        "debriefedShipped": shipped,
-        "debriefedNotShipped": not_shipped,
+        "phraseDictionaryCommit": DEBRIEFED_SHA,
+        "phraseDictionaryManifestVersion": DEBRIEFED_MANIFEST_VERSION,
+        "phraseDictionaryReportedRows": DEBRIEFED_REPORTED_ROWS,
+        "phraseDictionaryShippedRows": sum(shipped.values()),
+        "phraseDictionaryShipped": shipped,
+        "phraseDictionaryNotShipped": not_shipped,
         "onet": "31.0",
         "oohCrosswalk": "October 2026 file from the O*NET Resource Center, maintained by BLS",
     }
@@ -521,13 +492,13 @@ def main() -> None:
 
 
 def phrases_only() -> None:
-    """Refresh the Debriefed conversion without re-downloading DMDC or O*NET."""
+    """Refresh the phrase-dictionary conversion without re-downloading DMDC or O*NET."""
     existing = json.loads((OUT / "build-stats.json").read_text(encoding="utf-8"))
     occ_text = (OUT / "occupations.js").read_text(encoding="utf-8")
     occ_payload = json.loads(occ_text.split("=", 1)[1].strip().rstrip(";"))
     bundle = load_debriefed()
     curated, missing_codes = curated_from(bundle["curated_raw"], occ_payload["occ"])
-    write_debriefed_notice()
+    write_phrase_dictionary_license()
     shipped, not_shipped = debriefed_counts(bundle, curated)
     meta = dict(existing)
     meta.update(
@@ -548,12 +519,12 @@ def phrases_only() -> None:
             "framing": len(bundle["framing"]),
             "summaries": len(bundle["summaries"]),
             "ats": len(bundle["ats"]),
-            "debriefedCommit": DEBRIEFED_SHA,
-            "debriefedManifestVersion": DEBRIEFED_MANIFEST_VERSION,
-            "debriefedReportedRows": DEBRIEFED_REPORTED_ROWS,
-            "debriefedShippedRows": sum(shipped.values()),
-            "debriefedShipped": shipped,
-            "debriefedNotShipped": not_shipped,
+            "phraseDictionaryCommit": DEBRIEFED_SHA,
+            "phraseDictionaryManifestVersion": DEBRIEFED_MANIFEST_VERSION,
+            "phraseDictionaryReportedRows": DEBRIEFED_REPORTED_ROWS,
+            "phraseDictionaryShippedRows": sum(shipped.values()),
+            "phraseDictionaryShipped": shipped,
+            "phraseDictionaryNotShipped": not_shipped,
         }
     )
     dump_js(
@@ -578,7 +549,7 @@ def phrases_only() -> None:
     )
     dump_js("OVPT_META", meta, OUT / "meta.js")
     (OUT / "build-stats.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({k: meta[k] for k in ("debriefedShippedRows", "debriefedReportedRows", "debriefedShipped", "jargon")}, indent=2))
+    print(json.dumps({k: meta[k] for k in ("phraseDictionaryShippedRows", "phraseDictionaryReportedRows", "phraseDictionaryShipped", "jargon")}, indent=2))
 
 
 if __name__ == "__main__":
