@@ -12,10 +12,10 @@ This repository is public so it can be reviewed. It does not report a grant awar
 | --- | --- | --- |
 | [Career Pathway Translator](career-pathway-translator/index.html) | Search an Army, Navy, Air Force, Marine Corps, Coast Guard, or Space Force code or title. Read the DMDC crosswalk, O*NET 31.0 title, description, skills, and sample civilian titles. Optional duty rewording and pay-grade scope language come from the Debriefed dictionary. | 26,883 military rows (13,513 active), 1,016 occupations. About 3.1 MiB. |
 | [Scam Guardian](scam-guardian/index.html) | Paste a message, or read a screenshot with local OCR, and see which written scam rules matched. A small 2011 SMS model adds a separate hint. It does not detect deepfakes. | Rules plus a 10 KiB model. OCR runtime is about 14.2 MiB, loaded only with that page. |
-| [Plain-English AI Tutor](ai-tutor/index.html) | 36 glossary entries, 6 original lessons, and 19 quiz questions. Progress stays in this browser. | About 40 KiB of original text. |
+| [Plain-English AI Tutor](ai-tutor/index.html) | 12 original lessons, 95 glossary entries, and 64 quiz questions with explanations. Each factual claim links a public source. Progress stays in this browser and can be exported. | Original text in the page. |
 | [Transition Companion](transition-companion/index.html) | 32-step checklist from 24 months before separation through the first civilian year. Links the other tools and official public pages. A date highlights the closest window. | Checklist in the page. Checks live in `localStorage`. |
 
-Each folder has its own `index.html` and can be copied into a site’s `/public` directory. Paths between tools use `../`, so keep the four folders side by side if you want those links. A single folder still works on its own.
+Each folder has its own `index.html` and can be copied into a site’s public directory. Paths between tools, styles, the manifest, and the service worker are relative, so the same files work on GitHub Pages and under a subpath such as `/learn/open-veteran-pathways/`. Keep the four folders and the repository root side by side if you want the installable offline copy. A single tool folder still runs its own page. The install button and the shared offline cache live with the full set of files.
 
 ## Run them
 
@@ -25,14 +25,19 @@ From the repository root:
 python3 -m http.server 8765
 ```
 
+Or `python3 scripts/serve.py`, which is the same kind of static server with threads so the offline cache can fetch many files at once.
+
 Open `http://127.0.0.1:8765/`.
 
-Pasted text, quizzes, and the checklist also work if you open the HTML file directly. Screenshot OCR does not. Browsers block the OCR worker from `file://`. Use the local server, GitHub Pages, or any other static host for screenshots. The host does not receive the image. Tesseract runs in the page.
+Pasted text, quizzes, and the checklist also work if you open the HTML file directly. Screenshot OCR, installation, and the offline cache do not. Browsers block the OCR worker from `file://`, and a service worker needs HTTP. Use the local server, GitHub Pages, or any other static host. The host does not receive what you type or the image. Tesseract runs in the page.
 
-Check the logic without a browser:
+Check the logic without a browser, then the pages:
 
 ```bash
 node scripts/verify.mjs
+npm ci
+npx playwright install chromium
+npm test
 ```
 
 Rebuild career data or the SMS model only if you intend to refresh upstream files. The scripts download public files and write the JavaScript the pages already include:
@@ -63,11 +68,21 @@ Our code is [MIT](LICENSE). Other material keeps its own license. Details, inclu
 - Skill identifiers, prefixes, and Navy additional qualification designators are not in the career file.
 - Scam Guardian is an aid. A low score is not a clearance. It does not judge pictures of faces, voices, or video.
 - OCR misreads blurry screenshots. Correct the text before you rely on it.
-- Checklist progress is only as durable as the browser. Export the JSON backup from the companion if you need a copy.
+- Checklist progress and tutor progress are only as durable as the browser. Export the JSON backup from the companion or the tutor if you need a copy.
+- The offline cache stores the public files after the first visit. It does not store a classified network, and it does not make a shared computer private.
+- Scam Guardian does not detect deepfakes. The tutor’s synthetic-media lesson says so, and it does not explain how to make one.
+
+## Install and offline use
+
+`manifest.webmanifest` and `sw.js` sit at the repository root. `start_url` and `scope` are `./`, resolved from wherever the files are served, including a project-site subpath and a folder such as `/learn/open-veteran-pathways/`. Icons are flat brand-color bars in teal `#3DD8C8` and magenta `#DD378A` on black. They are not a logo.
+
+The service worker precaches each tool’s HTML, CSS, and scripts, the DMDC and O*NET files (`moc.js` and `occupations.js`), the naive Bayes model, and the Tesseract.js worker, LSTM cores, and English traineddata. The cache name is versioned. When a new version is installed, older caches are deleted. If a page is already open, it shows **Load the update** instead of swapping the running page by itself.
+
+Chrome and Edge can show an **Install** button when the site is served over HTTPS or localhost. iPhone and iPad use Safari’s Share menu, then Add to Home Screen. The instructions are on every page. After one online visit, the tools open again with the network off.
 
 ## GitHub Pages
 
-`.github/workflows/pages.yml` publishes the repository root with GitHub Actions. A repository admin still has to set Settings → Pages → Source to GitHub Actions. Until that is set, the workflow cannot deploy.
+`.github/workflows/pages.yml` checks `node scripts/verify.mjs`, then publishes the repository root with GitHub Actions. The public site is [https://rogerthenomad.github.io/open-veteran-pathways-toolkit/](https://rogerthenomad.github.io/open-veteran-pathways-toolkit/). `.nojekyll` is present so Pages serves the files as they are.
 
 ## License
 

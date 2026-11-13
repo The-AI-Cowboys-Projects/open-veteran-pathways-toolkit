@@ -4,21 +4,32 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+  <meta name="theme-color" content="#111111">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Pathways">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
   <title>Scam Guardian</title>
+  <link rel="icon" href="../icons/favicon-32.png" type="image/png">
+  <link rel="apple-touch-icon" href="../icons/icon-180.png">
+  <link rel="manifest" href="../manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
-    <div class="brand-bar"></div>
+    <div class="brand-bar" aria-hidden="true"></div>
     <div class="header-inner">
       <div>
-        <p>Open Veteran Pathways Toolkit</p>
+        <p class="wordmark">Open Veteran Pathways</p>
         <h1>Scam Guardian</h1>
-        <p>Check a message or a screenshot on this device. This page does not detect deepfakes, voice clones, or faces.</p>
+        <p class="lede">Check a message or a screenshot on this device. This page does not detect deepfakes, voice clones, or faces.</p>
       </div>
-      <button type="button" class="ghost" id="text-size" aria-pressed="false">Larger text</button>
+      <div class="header-actions">
+        <button type="button" class="ghost" id="text-size" aria-pressed="false">Larger text</button>
+        <button type="button" class="ghost" id="theme" aria-pressed="false">Dark theme</button>
+        <button type="button" class="ghost" id="install" hidden>Install</button>
+      </div>
     </div>
   </header>
   <nav class="wrap tool-nav" aria-label="Toolkit">
@@ -36,13 +47,19 @@
       <textarea id="text" required placeholder="Paste the wording here. Do not include your Social Security number, passwords, or medical details."></textarea>
       <label for="image">Or add a screenshot (read on this device)</label>
       <input id="image" type="file" accept="image/*">
-      <p id="ocr-status">Screenshot reading uses local Tesseract files in this folder. It needs a normal web address (a local server or GitHub Pages), not a double-clicked file, because browsers block the OCR worker from file://.</p>
+      <p id="ocr-status" class="state state-empty" role="status">Screenshot reading uses local Tesseract files in this folder. It needs a normal web address (a local server or GitHub Pages), not a double-clicked file, because browsers block the OCR worker from file://. No screenshot is loaded yet.</p>
+      <div id="ocr-progress" class="progress" hidden>
+        <div id="ocr-bar" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="ocr-status"></div>
+      </div>
+      <p id="ocr-error" class="state state-error" role="alert" hidden></p>
       <button type="submit">Analyze on this device</button>
     </form>
-    <div id="output" aria-live="polite"></div>
+    <div id="output" aria-live="polite">
+      <p class="state state-empty" id="empty-state">Results appear here after you analyze a message. A short note is not enough to judge, and a low result is not a clearance.</p>
+    </div>
     <section class="panel">
       <h2>How the rules were chosen</h2>
-      <p>The rules are original to this toolkit. They look for tactics described in public VA, VA OIG, FTC, and FBI IC3 material: benefits impersonation, pension poaching, claim fees, gift cards and wires, romance or emergency money requests, lookalike links, prize lures, and remote-access support. Each hit shows the phrase that matched and a link to a public page. The page does not download those sites when you analyze a message.</p>
+      <p>The rules are original to this toolkit. They look for tactics described in public VA, VA OIG, FTC, and FBI IC3 material: benefits impersonation, pension poaching, claim fees, gift cards and wires, romance or emergency money requests, lookalike links, prize lures, and remote-access support. Each hit shows the phrase that matched and a link to a public page. The page does not download those sites when you analyze a message. It does not inspect a face, a voice, or a video, and it does not detect deepfakes.</p>
       <p>A second, optional hint comes from a small naive Bayes model trained on the SMS Spam Collection v.1 (Almeida, Gómez Hidalgo, and Yamakami, 2011). The raw text messages are not included. At a 90% cutoff, one 20% holdout of that collection had about 88% precision and 99% recall. That is promotional text-message spam from around 2011, so the hint is weak on veteran-benefits fraud. The rule score does not change because of the model.</p>
       <p>The offline screenshot idea follows the approach in Scram by Erfan Mirhosseini (MIT), which runs Gemma on an Android phone. This page does not include Scram’s code or Google’s Gemma model. Gemma’s terms are not the MIT license, and the model is multi-gigabyte. OCR here is Tesseract.js 7 and tesseract.js-core 7, Apache-2.0, with English traineddata stored in <code>vendor/tesseract/</code>.</p>
     </section>
@@ -52,6 +69,7 @@
       <p>The AI Cowboys Foundation is a Texas 501(c)(3) in San Antonio. This tool is not affiliated with, endorsed by, or part of the Department of Defense, the Department of Veterans Affairs, or any other government agency. Outputs are for human review. They are not legal, medical, financial, benefits, or employment advice. Never enter classified information, Controlled Unclassified Information (CUI), protected health information, Social Security numbers, or other sensitive personal information. Everything on this page runs in your browser. The page does not send your text or screenshot to a server.</p>
     </div>
   </footer>
+  <script src="../shared/shell.js"></script>
   <script src="vendor/tesseract/tesseract.min.js"></script>
   <script src="data/rules.js"></script>
   <script src="data/model.js"></script>

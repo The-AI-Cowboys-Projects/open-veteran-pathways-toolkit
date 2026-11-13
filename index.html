@@ -4,19 +4,31 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+  <meta name="theme-color" content="#111111">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Pathways">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
   <title>Open Veteran Pathways Toolkit</title>
+  <link rel="icon" href="icons/favicon-32.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="shared/styles.css">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
-    <div class="brand-bar"></div>
+    <div class="brand-bar" aria-hidden="true"></div>
     <div class="header-inner">
       <div>
         <p>The AI Cowboys Foundation · San Antonio, Texas</p>
-        <h1>Open Veteran Pathways Toolkit</h1>
-        <p>Four offline tools for veterans, military families, and older adults. No account. No tracking.</p>
+        <h1 class="wordmark">Open Veteran Pathways</h1>
+        <p class="lede">Four offline tools for veterans, military families, and older adults. No account. No tracking.</p>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="ghost" id="text-size" aria-pressed="false">Larger text</button>
+        <button type="button" class="ghost" id="theme" aria-pressed="false">Dark theme</button>
+        <button type="button" class="ghost" id="install" hidden>Install</button>
       </div>
     </div>
   </header>
@@ -33,7 +45,7 @@
     </article>
     <article class="card">
       <h2>Plain-English AI Tutor</h2>
-      <p>A glossary, six short lessons, and quizzes about using AI carefully, written for this toolkit.</p>
+      <p>Twelve lessons, a glossary, and quizzes about using AI carefully, with sources you can open. Progress stays in this browser.</p>
       <a class="button" href="ai-tutor/index.html">Open the tutor</a>
     </article>
     <article class="card">
@@ -42,7 +54,7 @@
       <a class="button" href="transition-companion/index.html">Open the companion</a>
     </article>
     <section class="panel">
-      <p>These pages are static files. You can open them from a local web server or host the folders under a site’s public directory. They are not affiliated with the Department of Defense or the Department of Veterans Affairs. Read the disclaimer on each tool before you type.</p>
+      <p>These pages are static files. You can open them from a local web server, GitHub Pages, or a folder on another site. Paths between tools are relative, so the four folders stay side by side. They are not affiliated with the Department of Defense or the Department of Veterans Affairs. Read the disclaimer on each tool before you type.</p>
     </section>
   </main>
   <footer>
@@ -50,5 +62,6 @@
       <p>MIT License. Sources and limits are in the README and in docs/RESEARCH.md. The AI Cowboys Foundation is a Texas 501(c)(3). This repository is open source. It does not claim a grant award, a usage count, or a government partnership.</p>
     </div>
   </footer>
+  <script src="shared/shell.js"></script>
 </body>
 </html>
