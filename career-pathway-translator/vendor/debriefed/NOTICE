@@ -1,0 +1,14 @@
+Debriefed dictionary extracts
+
+Source: https://github.com/csimser/debriefed
+Commit: 7d75063a4d816ab615cdfbe8868045490837f725
+License: MIT. Copyright (c) 2026 Chris Simser.
+See LICENSE in this folder. The MIT license applies to Chris Simser's
+dictionary software and phrasing. It does not relicense U.S. government
+or O*NET data that may appear alongside it.
+
+Files derived for this toolkit (phrasing, curated MOS notes, ranks,
+acronyms, resume-bullet examples, and action verbs) are transformations
+of the public-data JSON in that commit. Occupation facts shown next to
+them come from the DMDC crosswalk and the O*NET 31.0 Database, which
+keep their own terms. See THIRD_PARTY_NOTICES.md.

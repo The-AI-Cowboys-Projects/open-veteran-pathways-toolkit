@@ -1,64 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transition Companion — Open Veteran Pathways Toolkit</title>
-  <style>
-    :root { --navy: #0A0A0E; --teal: #12A594; --magenta: #DD368A; --paper: #F7F5F0; }
-    body { font-family: system-ui, -apple-system, sans-serif; margin: 0; background: var(--paper); color: var(--navy); line-height: 1.5; }
-    .wrap { max-width: 720px; margin: 0 auto; padding: 2rem 1.25rem; }
-    h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
-    .sub { color: #444; margin-bottom: 1.5rem; }
-    .step { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; }
-    .step h3 { margin: 0 0 0.35rem 0; }
-    .step p { margin: 0 0 0.5rem 0; }
-    a.btn { display: inline-block; background: var(--magenta); color: white; text-decoration: none; padding: 0.5rem 0.9rem; border-radius: 6px; font-weight: 600; font-size: 0.9rem; }
-    a.btn:hover { background: #c02d78; }
-    footer { margin-top: 2rem; font-size: 0.8rem; color: #666; }
-    a { color: var(--teal); }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+  <title>Transition Companion</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="wrap">
-    <h1>Transition Companion</h1>
-    <p class="sub">Lightweight open guide that helps service members and veterans navigate next steps using the free tools in this toolkit. Offline-friendly.</p>
-
-    <div class="step">
-      <h3>1. Translate your service record</h3>
-      <p>Turn your MOS, AFSC, or Rating into civilian pathways and résumé language.</p>
-      <a class="btn" href="../career-pathway-translator/index.html">Open Career Pathway Translator</a>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="brand-bar"></div>
+    <div class="header-inner">
+      <div>
+        <p>Open Veteran Pathways Toolkit</p>
+        <h1>Transition Companion</h1>
+        <p>A checklist for the months before and after separation. Checks stay in this browser.</p>
+      </div>
+      <button type="button" class="ghost" id="text-size" aria-pressed="false">Larger text</button>
     </div>
-
-    <div class="step">
-      <h3>2. Learn responsible AI in plain English</h3>
-      <p>Build foundational knowledge with the offline tutor grounded in the Foundation’s guide and glossary.</p>
-      <a class="btn" href="../ai-tutor/index.html">Open Plain-English AI Tutor</a>
+  </header>
+  <nav class="wrap tool-nav" aria-label="Toolkit">
+    <a href="../index.html">Home</a>
+    <a href="../career-pathway-translator/index.html">Careers</a>
+    <a href="../scam-guardian/index.html">Scam Guardian</a>
+    <a href="../ai-tutor/index.html">AI Tutor</a>
+  </nav>
+  <main id="main" class="wrap">
+    <section class="panel">
+      <p>For service members, veterans, and family members helping them. The steps are reminders to read official pages and to use the other tools in this folder. They are not a separation order, a benefits decision, or a TAP completion certificate.</p>
+      <label for="separation-date">Separation or retirement date (stored only on this device)</label>
+      <input id="separation-date" type="date">
+      <p id="summary" aria-live="polite"></p>
+      <div class="row">
+        <button type="button" class="secondary" id="export">Download a backup file</button>
+        <div>
+          <label for="import">Restore a backup file</label>
+          <input id="import" type="file" accept="application/json,.json">
+        </div>
+      </div>
+      <p><button type="button" class="secondary" id="reset">Clear checklist on this browser</button></p>
+    </section>
+    <div id="list"></div>
+    <section class="panel">
+      <h2>What is stored</h2>
+      <p>Checked boxes and the date live in this browser’s localStorage under a key used only by this page. Download a backup if you want a copy you can move. There is no account. Links to VA, DoD, DOL, BLS partners, SBA, FTC, and IC3 open only when you choose them.</p>
+      <p>DoD COOL is linked at its public address. This checklist does not copy COOL catalogs. Open the official page yourself for credential information.</p>
+    </section>
+  </main>
+  <footer>
+    <div class="wrap">
+      <p>The AI Cowboys Foundation is a Texas 501(c)(3) in San Antonio. This tool is not affiliated with, endorsed by, or part of the Department of Defense, the Department of Veterans Affairs, or any other government agency. Outputs are for human review. They are not legal, medical, financial, benefits, or employment advice. Never enter classified information, Controlled Unclassified Information (CUI), protected health information, Social Security numbers, or other sensitive personal information. Everything on this page runs in your browser. The page does not send your checklist to a server.</p>
     </div>
-
-    <div class="step">
-      <h3>3. Protect yourself from scams</h3>
-      <p>Analyze suspicious messages or descriptions locally. Nothing leaves your device.</p>
-      <a class="btn" href="../scam-guardian/index.html">Open Scam Guardian</a>
-    </div>
-
-    <div class="step">
-      <h3>4. Explore national resources</h3>
-      <p>Connect to official VA, DoD, and trusted national training and benefits programs.</p>
-      <a class="btn" href="https://theaicowboysfoundation.org/learn/national-veteran-resources">National Veteran Resources Directory</a>
-    </div>
-
-    <div class="step">
-      <h3>5. Full Foundation tools</h3>
-      <p>Use the complete MOS to CEO Translator, AI Guide, Readiness Assessment, and more on the main site.</p>
-      <a class="btn" href="https://theaicowboysfoundation.org/learn/open-veteran-pathways">Open Veteran Pathways on the Foundation site</a>
-    </div>
-
-    <footer>
-      Open Veteran Pathways Toolkit · The AI Cowboys Foundation<br>
-      MIT License · Offline-first · Private by default<br>
-      All tools are free and open. No account required for core features.
-    </footer>
-  </div>
+  </footer>
+  <script src="data/plan.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
