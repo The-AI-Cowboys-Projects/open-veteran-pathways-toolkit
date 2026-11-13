@@ -190,7 +190,11 @@
       if (row[0] && row[0].length >= 8) pairs.push([row[0], row[1], "eval", "i"]);
     });
     (bundle.jargon || []).forEach(function (row) {
-      if (row[0] && row[0].length >= 4) pairs.push([row[0], row[1], "jargon", "i"]);
+      if (!row[0]) return;
+      if (row[0].length >= 4) pairs.push([row[0], row[1], "jargon", "i"]);
+      else if (row[0].length >= 2 && row[0].toLowerCase() !== "bow" && row[0].toLowerCase() !== "log") {
+        pairs.push([row[0], row[1], "jargon", ""]);
+      }
     });
     (bundle.acronyms || []).forEach(function (row) {
       if (row[0] && row[0].length >= 3) {
@@ -202,8 +206,39 @@
     return pairs;
   }
 
-  function translateDuty(bundle, text) {
+  function firstOption(text) {
+    return String(text || "").split(" / ")[0].trim();
+  }
+
+  function matchCase(original, replacement) {
+    if (!original || !replacement) return replacement;
+    if (original === original.toUpperCase() && original.length > 1) return replacement.toUpperCase();
+    if (original[0] === original[0].toUpperCase() && original.slice(1) !== original.slice(1).toUpperCase()) {
+      return replacement.charAt(0).toUpperCase() + replacement.slice(1);
+    }
+    if (original === original.toLowerCase()) return replacement.toLowerCase();
+    return replacement;
+  }
+
+  function postProcess(text) {
+    let out = String(text || "");
+    out = out.replace(/  +/g, " ");
+    out = out.replace(/\ba (a|e|i|o|u)/gi, function (full, vowel) {
+      return (full[0] === "A" ? "An " : "an ") + vowel;
+    });
+    out = out.replace(/\ban ([bcdfghjklmnpqrstvwxyz])/gi, function (full, consonant) {
+      return (full[0] === "A" ? "A " : "a ") + consonant;
+    });
+    out = out.replace(/ 's\b/g, "'s");
+    out = out.replace(/,\s*,/g, ",");
+    out = out.replace(/\.\s*\./g, ".");
+    out = out.replace(/\s+([.,;:!?])/g, "$1");
+    return out.trim();
+  }
+
+  function translateDuty(bundle, text, options) {
     const source = String(text || "");
+    const useFirst = Boolean(options && options.firstOption);
     if (source.trim().length < 3) return { replacements: [], rewritten: "" };
     const found = [];
     collectPairs(bundle).forEach(function (pair) {
@@ -211,11 +246,14 @@
       const re = new RegExp("\\b" + escapeReg(pair[0]) + "\\b", flags);
       let match;
       while ((match = re.exec(source))) {
+        const full = pair[1];
+        const shown = useFirst ? matchCase(match[0], firstOption(full)) : full;
         found.push({
           start: match.index,
           end: match.index + match[0].length,
           from: match[0],
-          to: pair[1],
+          to: shown,
+          full: full,
           kind: pair[2],
         });
         if (match.index === re.lastIndex) re.lastIndex += 1;
@@ -238,7 +276,89 @@
       pos = hit.end;
     });
     rewritten += source.slice(pos);
+    if (useFirst) rewritten = postProcess(rewritten);
     return { replacements: kept.slice(0, 40), rewritten: rewritten };
+  }
+
+  function vagueFlags(bundle, text) {
+    const hay = String(text || "").toLowerCase();
+    const found = [];
+    (bundle.vague || []).forEach(function (row) {
+      const phrase = String(row[0] || "");
+      if (phrase.length < 4 || hay.indexOf(phrase.toLowerCase()) === -1) return;
+      found.push({ phrase: phrase, alternatives: row[1] || [], category: row[2] || "" });
+    });
+    return found.slice(0, 6);
+  }
+
+  function verbHint(bundle, text) {
+    const match = String(text || "").trim().match(/^[A-Za-z]+/);
+    if (!match) return null;
+    const word = match[0].toLowerCase();
+    const rows = bundle.verbRows || [];
+    const current = rows.find(function (row) { return String(row[0] || "").toLowerCase() === word; });
+    if (!current || current[2] === "strong") return null;
+    const stronger = rows.find(function (row) {
+      return row[1] === current[1] && row[2] === "strong" && String(row[0]).toLowerCase() !== word;
+    });
+    if (!stronger) return null;
+    return { current: match[0], suggested: stronger[0], category: current[1], strength: current[2] };
+  }
+
+  function keywordHits(bundle, text) {
+    const hay = " " + String(text || "").toLowerCase() + " ";
+    const found = [];
+    (bundle.ats || []).forEach(function (row) {
+      (row.words || []).forEach(function (word) {
+        const token = String(word || "").toLowerCase();
+        if (token.length < 4 || hay.indexOf(token) === -1) return;
+        found.push({ word: word, industry: row.industry, role: row.role });
+      });
+    });
+    const unique = [];
+    const seen = {};
+    found.forEach(function (item) {
+      const key = item.word.toLowerCase();
+      if (seen[key]) return;
+      seen[key] = true;
+      unique.push(item);
+    });
+    return unique.slice(0, 8);
+  }
+
+  function translateFreeText(bundle, text) {
+    const raw = String(text || "").replace(/\r/g, "");
+    const pieces = raw.split(/\n+/).map(function (line) { return line.trim(); }).filter(Boolean);
+    const lines = (pieces.length ? pieces : [raw.trim()]).filter(Boolean).slice(0, 40).map(function (line) {
+      const duty = translateDuty(bundle, line, { firstOption: true });
+      return {
+        source: line,
+        rewritten: duty.rewritten || line,
+        replacements: duty.replacements,
+        vague: vagueFlags(bundle, line),
+        verb: verbHint(bundle, line),
+      };
+    });
+    return { lines: lines, keywords: keywordHits(bundle, raw) };
+  }
+
+  function summaryExample(bundle, query) {
+    const tokens = String(query || "").toLowerCase().split(/[^a-z0-9]+/).filter(function (token) {
+      return token.length >= 4;
+    });
+    if (!tokens.length) return null;
+    let best = null;
+    let bestScore = 0;
+    (bundle.summaries || []).forEach(function (row) {
+      const hay = (row.role + " " + row.industry + " " + row.tier).toLowerCase();
+      let score = 0;
+      tokens.forEach(function (token) { if (hay.indexOf(token) !== -1) score += 1; });
+      if (score > bestScore) {
+        bestScore = score;
+        best = row;
+      }
+    });
+    return bestScore ? best : null;
   }
 
   function rankLookup(bundle, branch, paygrade) {
@@ -286,6 +406,9 @@
     curatedFor: curatedFor,
     suggestBullets: suggestBullets,
     translateDuty: translateDuty,
+    translateFreeText: translateFreeText,
+    vagueFlags: vagueFlags,
+    summaryExample: summaryExample,
     rankLookup: rankLookup,
     plainSummary: plainSummary,
     isMilitaryOccupation: function (code) { return String(code || "").indexOf("55-") === 0; },

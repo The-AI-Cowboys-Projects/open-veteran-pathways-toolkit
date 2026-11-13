@@ -5,7 +5,7 @@ Thanks for improving a tool that people may trust with a career story or a scary
 ## Ground rules
 
 - The pages stay private by default. Do not add analytics, ad pixels, remote fonts, or a call that sends typed text or screenshots off the device.
-- Runtime code should keep working from the files in the repo. A link the user chooses to open is fine. `fetch` of a third-party API is not.
+- Runtime code should keep working from the files in the repo. A link the user chooses to open is fine. The only runtime download is the optional Gemma model, and only after the person confirms it. Do not precache those weights.
 - Do not add classified examples, real Social Security numbers, medical notes, or other people’s personal messages.
 - New third-party text or data needs a license that allows redistribution with this MIT repository. Put the notice in `THIRD_PARTY_NOTICES.md` and, when the upstream license requires a file, under that tool’s `vendor/` folder. If the license is missing or incompatible, do not copy the material. Say what you rejected in `docs/RESEARCH.md`.
 - Do not relicense O*NET, DMDC, BLS, or the SMS Spam Collection as MIT.

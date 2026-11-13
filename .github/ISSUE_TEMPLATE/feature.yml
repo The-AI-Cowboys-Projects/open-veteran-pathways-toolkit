@@ -1,0 +1,19 @@
+name: Change
+description: A focused change to a tool, a test, or the docs
+title: "feat: "
+labels: []
+body:
+  - type: textarea
+    id: change
+    attributes:
+      label: What should change
+      description: Keep it to one tool or one document. Do not request hidden data collection.
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source, if the change uses someone else’s work
+      description: Link the project and name the license. Leave blank if the change is original.
+    validations:
+      required: false

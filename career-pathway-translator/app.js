@@ -353,7 +353,62 @@
   });
 
   const about = document.getElementById("about-counts");
-  about.textContent = meta.mocRows + " military records (" + meta.mocActive + " active) from DMDC " + meta.mocFile + ", " + meta.occupations + " O*NET 31.0 occupations, and " + meta.curated + " Debriefed code notes. Debriefed commit " + meta.debriefedCommit + ".";
+  about.textContent = meta.mocRows + " military records (" + meta.mocActive + " active) from DMDC " + meta.mocFile + ", " + meta.occupations + " O*NET 31.0 occupations, and " + meta.debriefedShippedRows + " Debriefed dictionary rows converted for this page (the upstream manifest reports " + meta.debriefedReportedRows + "). Debriefed commit " + meta.debriefedCommit + ".";
+
+  function renderFreeText(text) {
+    const slot = document.getElementById("phrase-output");
+    const result = engine.translateFreeText(phrases, text);
+    slot.replaceChildren();
+    if (!result.lines.length) {
+      slot.append(p("Paste a line to translate. Nothing is uploaded.", "state state-empty"));
+      return;
+    }
+    result.lines.forEach(function (line) {
+      const box = h("article", { class: "card" });
+      box.append(h("h3", { text: "Dictionary wording" }));
+      box.append(p("Original: " + line.source));
+      box.append(p(line.rewritten));
+      if (!line.replacements.length) {
+        box.append(p("No phrase, jargon, evaluation line, or acronym in the shipped dictionary matched this line. Leave your wording, or try a more specific military term."));
+      } else {
+        const list = h("ul");
+        line.replacements.forEach(function (hit) {
+          list.append(h("li", { text: hit.kind + ": " + hit.from + " → " + hit.to }));
+        });
+        box.append(list);
+      }
+      if (line.vague.length) {
+        box.append(p("The dictionary flags this as vague and offers templates with blanks. Fill the blanks from your record. Do not invent a number."));
+        line.vague.forEach(function (flag) {
+          box.append(p(flag.phrase + ": " + flag.alternatives.join(" | ")));
+        });
+      }
+      if (line.verb) {
+        box.append(p("Verb suggestion from the dictionary, not applied automatically: “" + line.verb.current + "” is marked " + line.verb.strength + " under " + line.verb.category + ". One strong verb in that category is “" + line.verb.suggested + "”. Use it only if it is still true."));
+      }
+      slot.append(box);
+    });
+    if (result.keywords.length) {
+      slot.append(p("Keyword lists in the dictionary already contain these words from your text: " + result.keywords.map(function (item) {
+        return item.word + " (" + item.role + ")";
+      }).join("; ") + ". That is not an applicant-tracking score."));
+    }
+    const example = engine.summaryExample(phrases, text);
+    if (example) {
+      const box = h("article", { class: "warning" });
+      box.append(h("h3", { text: "Dictionary example, not your summary" }));
+      box.append(p(example.role + " · " + example.industry));
+      box.append(p(example.text));
+      box.append(p("Numbers in that example were written by the dictionary author. Do not copy a year, a headcount, or a dollar figure you cannot document."));
+      slot.append(box);
+    }
+    slot.append(p("Review every line before it goes on a résumé. This is not a job offer or a qualification finding."));
+  }
+
+  document.getElementById("phrase-form").addEventListener("submit", function (event) {
+    event.preventDefault();
+    renderFreeText(document.getElementById("phrase-text").value);
+  });
   fillRanks();
   renderHistory();
 })();

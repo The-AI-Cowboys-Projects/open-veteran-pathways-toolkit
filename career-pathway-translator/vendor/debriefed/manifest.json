@@ -1,0 +1,139 @@
+{
+  "version": "2026-05-20.83b39983",
+  "source_exported_at": "2026-05-20T18:40:00.200Z",
+  "total_rows": 34071,
+  "tables": [
+    {
+      "table": "dict_acronyms",
+      "rows": 1149,
+      "file": "acronyms.json",
+      "bytes": 173820
+    },
+    {
+      "table": "dict_action_verbs",
+      "rows": 1109,
+      "file": "action_verbs.json",
+      "bytes": 139450
+    },
+    {
+      "table": "dict_ats_keywords",
+      "rows": 678,
+      "file": "ats_keywords.json",
+      "bytes": 143706
+    },
+    {
+      "table": "dict_bullet_patterns",
+      "rows": 845,
+      "file": "bullet_patterns.json",
+      "bytes": 458332
+    },
+    {
+      "table": "dict_cert_funding",
+      "rows": 123,
+      "file": "cert_funding.json",
+      "bytes": 18671
+    },
+    {
+      "table": "dict_cover_letter_templates",
+      "rows": 351,
+      "file": "cover_letter_templates.json",
+      "bytes": 698027
+    },
+    {
+      "table": "dict_eval_phrases",
+      "rows": 745,
+      "file": "eval_phrases.json",
+      "bytes": 169489
+    },
+    {
+      "table": "dict_funding_programs",
+      "rows": 15,
+      "file": "funding_programs.json",
+      "bytes": 13641
+    },
+    {
+      "table": "dict_gap_recommendations",
+      "rows": 86,
+      "file": "gap_recommendations.json",
+      "bytes": 48948
+    },
+    {
+      "table": "dict_industry_framing",
+      "rows": 36,
+      "file": "industry_framing.json",
+      "bytes": 10356
+    },
+    {
+      "table": "dict_linkedin_keywords",
+      "rows": 447,
+      "file": "linkedin_keywords.json",
+      "bytes": 85517
+    },
+    {
+      "table": "dict_linkedin_templates",
+      "rows": 10,
+      "file": "linkedin_templates.json",
+      "bytes": 5846
+    },
+    {
+      "table": "dict_military_jargon",
+      "rows": 1675,
+      "file": "military_jargon.json",
+      "bytes": 299408
+    },
+    {
+      "table": "dict_mos_to_civilian",
+      "rows": 493,
+      "file": "mos_to_civilian.json",
+      "bytes": 167453
+    },
+    {
+      "table": "dict_onet_crosswalk",
+      "rows": 24248,
+      "file": "onet_crosswalk.json",
+      "bytes": 4663267
+    },
+    {
+      "table": "dict_phrase_translations",
+      "rows": 1124,
+      "file": "phrase_translations.json",
+      "bytes": 186323
+    },
+    {
+      "table": "dict_professional_summaries",
+      "rows": 404,
+      "file": "professional_summaries.json",
+      "bytes": 231043
+    },
+    {
+      "table": "dict_quantification_helpers",
+      "rows": 24,
+      "file": "quantification_helpers.json",
+      "bytes": 8709
+    },
+    {
+      "table": "dict_rank_equivalents",
+      "rows": 57,
+      "file": "rank_equivalents.json",
+      "bytes": 15368
+    },
+    {
+      "table": "dict_resume_templates",
+      "rows": 3,
+      "file": "resume_templates.json",
+      "bytes": 3992
+    },
+    {
+      "table": "dict_soft_skills",
+      "rows": 22,
+      "file": "soft_skills.json",
+      "bytes": 5989
+    },
+    {
+      "table": "onet_occupations",
+      "rows": 427,
+      "file": "onet-occupations.json",
+      "bytes": 28370
+    }
+  ]
+}

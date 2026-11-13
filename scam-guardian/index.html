@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Pathways">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://huggingface.co https://cdn-lfs.huggingface.co https://cas-bridge.xethub.hf.co; worker-src 'self' blob:; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
   <title>Scam Guardian</title>
   <link rel="icon" href="../icons/favicon-32.png" type="image/png">
   <link rel="apple-touch-icon" href="../icons/icon-180.png">
@@ -52,8 +52,15 @@
         <div id="ocr-bar" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="ocr-status"></div>
       </div>
       <p id="ocr-error" class="state state-error" role="alert" hidden></p>
+      <label for="channel">Where the text came from</label>
+      <select id="channel" name="channel">
+        <option value="messaging">Text message</option>
+        <option value="email">Email</option>
+        <option value="other">Other</option>
+      </select>
       <button type="submit">Analyze on this device</button>
     </form>
+    <section class="panel" id="model-panel"></section>
     <div id="output" aria-live="polite">
       <p class="state state-empty" id="empty-state">Results appear here after you analyze a message. A short note is not enough to judge, and a low result is not a clearance.</p>
     </div>
@@ -61,7 +68,7 @@
       <h2>How the rules were chosen</h2>
       <p>The rules are original to this toolkit. They look for tactics described in public VA, VA OIG, FTC, and FBI IC3 material: benefits impersonation, pension poaching, claim fees, gift cards and wires, romance or emergency money requests, lookalike links, prize lures, and remote-access support. Each hit shows the phrase that matched and a link to a public page. The page does not download those sites when you analyze a message. It does not inspect a face, a voice, or a video, and it does not detect deepfakes.</p>
       <p>A second, optional hint comes from a small naive Bayes model trained on the SMS Spam Collection v.1 (Almeida, Gómez Hidalgo, and Yamakami, 2011). The raw text messages are not included. At a 90% cutoff, one 20% holdout of that collection had about 88% precision and 99% recall. That is promotional text-message spam from around 2011, so the hint is weak on veteran-benefits fraud. The rule score does not change because of the model.</p>
-      <p>The offline screenshot idea follows the approach in Scram by Erfan Mirhosseini (MIT), which runs Gemma on an Android phone. This page does not include Scram’s code or Google’s Gemma model. Gemma’s terms are not the MIT license, and the model is multi-gigabyte. OCR here is Tesseract.js 7 and tesseract.js-core 7, Apache-2.0, with English traineddata stored in <code>vendor/tesseract/</code>.</p>
+      <p>The offline screenshot idea, the messaging, email, and other categories, and the point rubric are adapted from Scram by Erfan Mirhosseini (MIT), commit 8610b7db4b2d6f8398b5ecbef0c4a18a0e81e1bf. The rubric is a second reading. It does not change the written-rule level. Scram’s Android app and its 3.1 GB Gemma 3n weights are not included. OCR here is Tesseract.js 7 and tesseract.js-core 7, Apache-2.0, with English traineddata stored in <code>vendor/tesseract/</code>. An optional smaller Gemma model can be downloaded later on this page. It is not required.</p>
     </section>
   </main>
   <footer>
@@ -74,6 +81,7 @@
   <script src="data/rules.js"></script>
   <script src="data/model.js"></script>
   <script src="engine.js"></script>
+  <script src="../shared/local-model.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

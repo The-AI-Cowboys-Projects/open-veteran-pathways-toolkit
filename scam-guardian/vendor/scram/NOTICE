@@ -1,0 +1,30 @@
+Scram prompts, taxonomy, and screenshot-text approach
+
+Source: https://github.com/erfunm/Scram
+Commit: 8610b7db4b2d6f8398b5ecbef0c4a18a0e81e1bf
+License: MIT. Copyright (c) 2025 Erfan Mirhosseini.
+See LICENSE in this folder.
+
+What was reused, from files that are part of that MIT project:
+
+- App categories messaging, email, and other, from AppDetectorHelper.kt.
+- The messaging point rubric, the email checklist, and the general scam
+  prompt, adapted into scam-guardian/engine.js. The adaptation keeps the
+  scope to scam and phishing text. It does not copy the 0.85 and 0.15
+  figures in ScamDetectionModelHelper.kt, because those numbers are fixed
+  in the parser and are not a measured probability.
+- The idea of reading a screenshot on the device, then judging the text.
+  This page uses the already vendored Tesseract.js files for that reading.
+  Scram's Android code, ML Kit, and screen-capture service are not included.
+
+What was not copied, after reading the license and the tree:
+
+- Gemma 3n weights. They are not in the Scram repository. Scram's README
+  describes a 3.1 GB model under Google's Gemma terms, which are not MIT.
+- App icons, Gradle files, and the empty GemmaLlmHelper.kt.
+- TECHNICAL.md performance figures. They are the author's description of
+  the Android app. This toolkit does not repeat them as its own results.
+
+The optional browser model in this toolkit is a different, smaller Gemma
+build. Its terms are separate from the MIT license above and are shown on
+the page before download.
