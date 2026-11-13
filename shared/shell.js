@@ -76,7 +76,9 @@
   var updateBtn = el("button", { type: "button", text: "Load the update" });
   bannerInner.append(updateBtn);
   banner.append(bannerInner);
-  document.body.insertBefore(banner, document.body.firstChild);
+  var skip = document.querySelector("a.skip");
+  if (skip && skip.parentNode) skip.parentNode.insertBefore(banner, skip.nextSibling);
+  else document.body.insertBefore(banner, document.body.firstChild);
 
   var main = document.getElementById("main");
   if (main) {

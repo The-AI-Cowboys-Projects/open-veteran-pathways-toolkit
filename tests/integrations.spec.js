@@ -13,7 +13,7 @@ test("free-text translation sits beside the code lookup and stays on the device"
   await expect(page.locator("#phrase-output")).toContainText(/c-suite|presented/i);
   await expect(page.locator("#phrase-output")).toContainText("personnel");
   await expect(page.locator("#phrase-output")).toContainText("not a job offer");
-  expect(hosts.some((host) => host.indexOf("huggingface") !== -1)).toBe(false);
+  expect(hosts.some((host) => host === "huggingface.co" || host.split(".").slice(-2).join(".") === "huggingface.co")).toBe(false);
 });
 
 test("scam rules and rubric work with the model absent and make no model request", async ({ page }) => {
@@ -32,7 +32,7 @@ test("scam rules and rubric work with the model absent and make no model request
   await expect(page.locator("#message-rubric")).toContainText("scam");
   await page.locator("#model-ask").click();
   await expect(page.locator("#model-suggestion")).toContainText("not on this device");
-  expect(hosts.some((host) => host.indexOf("huggingface") !== -1)).toBe(false);
+  expect(hosts.some((host) => host === "huggingface.co" || host.split(".").slice(-2).join(".") === "huggingface.co")).toBe(false);
 });
 
 test("tutor shows sourced passages and does not require the model", async ({ page }) => {

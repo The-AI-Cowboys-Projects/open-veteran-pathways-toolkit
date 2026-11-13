@@ -1,5 +1,5 @@
 /* Offline cache for the toolkit. Paths are relative to this file so a subpath host works. */
-var CACHE = "ovpt-static-v3";
+var CACHE = "ovpt-static-v4";
 var PRECACHE = [
   "index.html",
   "manifest.webmanifest",
@@ -43,6 +43,9 @@ var PRECACHE = [
   "ai-tutor/data/content.js",
   "ai-tutor/retrieve.js",
   "docs/agent-security-practices.md",
+  "docs/ACCESSIBILITY.md",
+  "docs/EVALUATION.md",
+  "docs/PILOT_PLAN.md",
   "transition-companion/index.html",
   "transition-companion/styles.css",
   "transition-companion/app.js",

@@ -80,12 +80,12 @@ The companion tells the person that checking a box is their action.
 - Checklist progress and tutor progress are only as durable as the browser. Export the JSON backup from the companion or the tutor if you need a copy.
 - The offline cache stores the public files after the first visit. It does not store a classified network, and it does not make a shared computer private.
 - Scam Guardian does not detect deepfakes. The tutor’s synthetic-media lesson says so, and it does not explain how to make one.
-- The optional Gemma model was not scored on veteran-benefits messages in this repository. A label it returns is not a measured probability. The written rules do not change because of it.
+- The optional Gemma model was not scored on veteran-benefits messages in this repository. A label it returns is not a measured probability. The written rules do not change because of it. The rule engine, the point rubric, and the small SMS model were scored on 22 synthetic messages. The numbers and the limits are in [docs/EVALUATION.md](docs/EVALUATION.md).
 - The phrase dictionary shipped here is 8,361 rows. It is not the military crosswalk.
 
 ## Install and offline use
 
-`manifest.webmanifest` and `sw.js` sit at the repository root. `start_url` and `scope` are `./`, resolved from wherever the files are served, including a project-site subpath and a folder such as `/learn/open-veteran-pathways/`. Icons are flat brand-color bars in teal `#3DD8C8` and magenta `#DD378A` on black. They are not a logo.
+`manifest.webmanifest` and `sw.js` sit at the repository root. `start_url` and `scope` are `./`, resolved from wherever the files are served, including a project-site subpath and a folder such as `/learn/open-veteran-pathways/`. Icons are flat brand-color bars in teal `#3DD8C8` and magenta `#DD378A` on black. They are not a logo. Buttons use interface magenta `#D4348A` so black text on the button and the color on white both clear WCAG 2.1 AA for normal text. See [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md).
 
 The service worker precaches each tool’s HTML, CSS, and scripts, the DMDC and O*NET files (`moc.js` and `occupations.js`), the naive Bayes model, and the Tesseract.js worker, LSTM cores, and English traineddata. The cache name is versioned. When a new version is installed, older caches are deleted. If a page is already open, it shows **Load the update** instead of swapping the running page by itself.
 
@@ -101,9 +101,25 @@ Chrome and Edge can show an **Install** button when the site is served over HTTP
 
 `.github/workflows/release-zip.yml` builds that zip on demand and attaches it to a GitHub release when a tag named `v*` is pushed.
 
+## Accessibility
+
+The target is WCAG 2.1 Level AA for the landing page and the four tools. [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) lists the contrast figures, the axe-core checks, and the screen-reader pass that has not been done.
+
+## Evaluation
+
+`npm run eval:scam` scores Scam Guardian on 22 synthetic messages. [docs/EVALUATION.md](docs/EVALUATION.md) has the numbers from that script, including the misses. The optional on-device model was not scored.
+
+## Pilot plan
+
+[docs/PILOT_PLAN.md](docs/PILOT_PLAN.md) is a plan for a later usability session with veterans, recruited through veteran service organizations and university veteran centers. It is not a report of a session, a partner, or a user count.
+
+## Security posture
+
+There is no account and no analytics. Typed text stays in the browser unless the person chooses the optional model download. Actions are pinned to commit SHAs. Workflow permissions start at `contents: read`. `npm audit` is expected to report 0 known vulnerabilities. Report a problem as [SECURITY.md](SECURITY.md) describes, to contact_us@theaicowboys.com, and do not include personal information. Each tool page has a Send feedback link to that address with the same reminder.
+
 ## Docs
 
-The notes in [docs/README.md](docs/README.md) index the research record and the agent-security note.
+The notes in [docs/README.md](docs/README.md) index the research record, the agent-security note, the accessibility statement, the evaluation, and the pilot plan.
 
 ## License
 

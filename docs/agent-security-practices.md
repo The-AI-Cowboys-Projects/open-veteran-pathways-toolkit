@@ -9,7 +9,7 @@ This note says how the Plain-English AI Tutor and the Transition Companion apply
 ## What the pages do
 
 - A person chooses every step. The tutor does not mark a lesson read, score a quiz, or send a question until the person uses the control. The companion does not check a box because a date is close. A highlighted window is a cue, not a completed step.
-- Neither page takes an action outside the browser. There is no form submission to an agency, no email, and no scheduled task.
+- Neither page takes an action outside the browser on its own. There is no form submission to an agency and no scheduled task. A Send feedback link opens the person’s own email program with a reminder not to include personal information. The page does not send that message.
 - The tutor’s question box searches the lessons and glossary that ship in `ai-tutor/data/content.js`. The passages and their source links are shown before any model wording.
 - An optional on-device model can phrase an answer only from those passages. The page asks it to cite a passage id. If the reply does not name one of the passages just shown, the page says not to use the reply. The model is a suggestion for a person to review.
 - The same model, on Scam Guardian, is limited to scam and phishing text. It is not a deepfake detector and it does not change the written-rule level.

@@ -125,11 +125,15 @@
       if (!q) return true;
       return (item.term + " " + item.plain + " " + item.example).toLowerCase().indexOf(q) !== -1;
     });
+    const status = document.getElementById("glossary-status");
     glossary.replaceChildren();
     if (!items.length) {
-      glossary.append(h("p", { class: "state state-empty", role: "status", text: "No glossary entry contains that word. Try prompt, hallucination, privacy, or phishing." }));
+      const empty = "No glossary entry contains that word. Try prompt, hallucination, privacy, or phishing.";
+      if (status) status.textContent = empty;
+      glossary.append(h("p", { class: "state state-empty", text: empty }));
       return;
     }
+    if (status) status.textContent = "Showing " + items.length + " of " + data.glossary.length + " glossary entries.";
     items.forEach(function (item) {
       const card = h("article", { class: "card" });
       card.append(h("h3", { text: item.term }));
@@ -217,7 +221,8 @@
       const lead = unanswered
         ? correct + " of " + lesson.quiz.length + " matched the answer key. " + unanswered + " question" + (unanswered === 1 ? " was" : "s were") + " left blank."
         : correct + " of " + lesson.quiz.length + " matched the answer key.";
-      result.replaceChildren(h("p", { text: lead }), review);
+      const leadNode = h("p", { tabindex: "-1", text: lead });
+      result.replaceChildren(leadNode, review);
       const state = progress();
       state.scores = state.scores || {};
       state.scores[lesson.id] = { correct: correct, total: lesson.quiz.length, at: new Date().toISOString() };
@@ -230,6 +235,7 @@
       state.read[lesson.id] = true;
       save(state);
       renderLessons();
+      leadNode.focus();
     });
     article.append(form);
     reader.append(article);
@@ -299,8 +305,11 @@
   }
   function renderPassages(passages) {
     askOutput.replaceChildren();
+    const heading = h("h2", { id: "ask-heading", tabindex: "-1", text: passages.length ? "Sourced passages" : "No matching passages" });
+    askOutput.append(heading);
     if (!passages.length) {
       askOutput.append(h("p", { class: "state state-empty", text: "No lesson or glossary passage matched those words. Try a term from the glossary." }));
+      heading.focus();
       return;
     }
     passages.forEach(function (item) {
@@ -312,6 +321,7 @@
       if (line) card.append(line);
       askOutput.append(card);
     });
+    heading.focus();
   }
   if (askForm && window.TutorRetrieve) {
     askForm.addEventListener("submit", function (event) {

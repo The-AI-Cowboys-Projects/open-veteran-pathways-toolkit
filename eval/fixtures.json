@@ -1,0 +1,138 @@
+{
+  "synthetic": true,
+  "notice": "Hand-written synthetic veteran-benefits messages for the rule engine. They are not real reports. They contain no real person, address, account, medical record, or government identifier.",
+  "items": [
+    {
+      "id": "va-suspend-gift",
+      "label": "scam",
+      "channel": "messaging",
+      "text": "This is the Department of Veterans Affairs. Your benefits are suspended. Call immediately and pay with a gift card."
+    },
+    {
+      "id": "rating-fee",
+      "label": "scam",
+      "channel": "email",
+      "text": "We can increase your disability rating. Guaranteed approval. We only take a percent of your back pay after the decision."
+    },
+    {
+      "id": "pension-poach",
+      "label": "scam",
+      "channel": "email",
+      "text": "Move your assets into an irrevocable trust so you qualify for a VA pension. An up-front fee applies before we file."
+    },
+    {
+      "id": "secrets-request",
+      "label": "scam",
+      "channel": "messaging",
+      "text": "Veterans Affairs hotline. Confirm your social security number and bank account so we can release your compensation today."
+    },
+    {
+      "id": "lookalike-link",
+      "label": "scam",
+      "channel": "messaging",
+      "text": "Your claim status changed. Open https://veteran-benefits-help.example/claim now and stay on the line."
+    },
+    {
+      "id": "romance-wire",
+      "label": "scam",
+      "channel": "messaging",
+      "text": "I love you. I am a deployed soldier stranded overseas. We can be together if you send a wire transfer today."
+    },
+    {
+      "id": "prize-fee",
+      "label": "scam",
+      "channel": "email",
+      "text": "You have won an unclaimed inheritance from a veteran estate. Pay the processing fee with bitcoin to release the prize money."
+    },
+    {
+      "id": "family-bail",
+      "label": "scam",
+      "channel": "messaging",
+      "text": "Grandma, it's your grandson. I'm in jail and need bail money tonight. Don't tell mom. Send a wire transfer."
+    },
+    {
+      "id": "remote-access",
+      "label": "scam",
+      "channel": "messaging",
+      "text": "Microsoft support calling about a veteran refund. Install AnyDesk so I can fix your computer and finish the refund."
+    },
+    {
+      "id": "charity-pressure",
+      "label": "scam",
+      "channel": "messaging",
+      "text": "Disabled veteran charity appeal. Donate now with a gift card. This is urgent and the drive ends tonight."
+    },
+    {
+      "id": "va-loan",
+      "label": "scam",
+      "channel": "email",
+      "text": "Refinance your VA mortgage today. Lowest rate guaranteed. Act now. A processing fee is due before the new loan starts."
+    },
+    {
+      "id": "urgency-only",
+      "label": "scam",
+      "channel": "messaging",
+      "text": "Final notice. Act now. Do not tell anyone about this message. This is your last warning about the paperwork."
+    },
+    {
+      "id": "subtle-code",
+      "label": "scam",
+      "channel": "messaging",
+      "text": "Hello, this is a specialist calling about the paperwork you started. Please stay available and share the code they text you."
+    },
+    {
+      "id": "clinic-appointment",
+      "label": "not_scam",
+      "channel": "messaging",
+      "text": "Reminder: Your VA clinic appointment is Tuesday at 10 a.m. Bring a photo ID. This note does not ask you to pay or to call a new number."
+    },
+    {
+      "id": "gi-bill-info",
+      "label": "not_scam",
+      "channel": "email",
+      "text": "If education is part of your plan, read the GI Bill overview on the official site you already use. This note does not ask you to pay or to send documents."
+    },
+    {
+      "id": "otp-do-not-share",
+      "label": "not_scam",
+      "channel": "messaging",
+      "text": "Your passcode to log in is 150952. Do not share this code."
+    },
+    {
+      "id": "office-holiday",
+      "label": "not_scam",
+      "channel": "email",
+      "text": "The county veterans service office will be closed Monday for a holiday. No action is needed and nothing is due."
+    },
+    {
+      "id": "deposit-notice",
+      "label": "not_scam",
+      "channel": "email",
+      "text": "A disability compensation deposit was posted to the account you already use. This note does not ask you to call, click, or confirm any number."
+    },
+    {
+      "id": "tap-workshop",
+      "label": "not_scam",
+      "channel": "email",
+      "text": "Your installation transition workshop is on the calendar you already control. Bring your own notes. Nothing in this note asks for a payment."
+    },
+    {
+      "id": "protective-gift-card",
+      "label": "not_scam",
+      "channel": "messaging",
+      "text": "A real agency will not ask you to pay with a gift card. If someone does, hang up and look up the agency yourself."
+    },
+    {
+      "id": "scam-awareness",
+      "label": "not_scam",
+      "channel": "email",
+      "text": "Scammers sometimes say your benefits will be suspended. Check the official site you already bookmarked. This message does not ask for money."
+    },
+    {
+      "id": "skillbridge-info",
+      "label": "not_scam",
+      "channel": "email",
+      "text": "Read the official SkillBridge description on the military site you type yourself before you sign anything with an employer."
+    }
+  ]
+}

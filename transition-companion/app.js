@@ -105,6 +105,8 @@
           next.checks[item.id] = input.checked;
           save(next);
           render();
+          const again = document.getElementById(id);
+          if (again) again.focus();
         });
         const text = h("span");
         text.append(document.createTextNode(item.text));

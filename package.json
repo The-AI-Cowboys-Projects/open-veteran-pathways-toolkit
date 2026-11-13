@@ -12,10 +12,12 @@
     "build:career": "python3 scripts/build_career_data.py",
     "build:scam-model": "python3 scripts/build_scam_model.py",
     "vendor:tesseract": "bash scripts/vendor_tesseract.sh",
-    "package:zip": "python3 scripts/package_offline_zip.py"
+    "package:zip": "python3 scripts/package_offline_zip.py",
+    "eval:scam": "node eval/run.mjs"
   },
   "license": "MIT",
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@playwright/test": "^1.65.0"
   }
 }

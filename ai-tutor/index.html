@@ -37,12 +37,13 @@
     <a href="../index.html">Home</a>
     <a href="../career-pathway-translator/index.html">Careers</a>
     <a href="../scam-guardian/index.html">Scam Guardian</a>
+    <a href="index.html" aria-current="page">AI Tutor</a>
     <a href="../transition-companion/index.html">Transition Companion</a>
   </nav>
   <main id="main" class="wrap">
     <section class="panel">
       <h2>Your progress on this browser</h2>
-      <p id="progress-summary" class="state state-loading" aria-live="polite">Loading lesson progress stored on this device.</p>
+      <p id="progress-summary" class="state state-loading" aria-live="polite" aria-atomic="true">Loading lesson progress stored on this device.</p>
       <div id="progress-meter" class="progress" hidden>
         <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="progress-summary"></div>
       </div>
@@ -55,6 +56,7 @@
       <h2>Glossary</h2>
       <label for="q">Search the glossary</label>
       <input id="q" type="search" placeholder="Try prompt, hallucination, privacy, phishing">
+      <p id="glossary-status" class="visually-hidden" aria-live="polite"></p>
       <div id="glossary">
         <p class="state state-loading" id="glossary-boot">Loading glossary entries stored with this page.</p>
       </div>
@@ -80,11 +82,11 @@
         <input id="ask" type="text" autocomplete="off" placeholder="Example: what is phishing?">
         <button type="submit">Find sourced passages</button>
       </form>
-      <div id="ask-output" aria-live="polite">
+      <div id="ask-output" aria-live="polite" aria-atomic="true">
         <p class="state state-empty" id="ask-empty">Passages from this tutor appear here. The search does not use a network.</p>
       </div>
       <p><button type="button" id="ask-model">Ask the on-device model</button></p>
-      <div id="model-answer" aria-live="polite"></div>
+      <div id="model-answer" aria-live="polite" aria-atomic="true"></div>
     </section>
     <section class="panel" id="model-panel"></section>
     <section class="panel">
@@ -97,6 +99,7 @@
   <footer>
     <div class="wrap">
       <p class="built-by">Built by The AI Cowboys</p>
+      <p><a href="mailto:contact_us@theaicowboys.com?subject=Open%20Veteran%20Pathways%20feedback%3A%20Plain-English%20AI%20Tutor&amp;body=Please%20do%20not%20include%20personal%20information.%20Do%20not%20include%20classified%20information%2C%20CUI%2C%20PHI%2C%20SPII%2C%20medical%20details%2C%20account%20numbers%2C%20or%20a%20real%20message%20that%20contains%20someone%20else's%20data.%20Name%20the%20page%20and%20what%20happened.">Send feedback</a></p>
       <p>The AI Cowboys Foundation, <a href="https://www.theaicowboysfoundation.org/" rel="noopener noreferrer">www.theaicowboysfoundation.org</a>, a veteran-owned AI lab in San Antonio. The Foundation is a Texas 501(c)(3).</p>
       <p>This tool is not affiliated with, endorsed by, or part of the Department of Defense or the Department of Veterans Affairs. Outputs are for human review. They are not legal, medical, financial, benefits, or employment advice. Never enter classified information, Controlled Unclassified Information (CUI), protected health information (PHI), or sensitive personally identifiable information (SPII). Everything on this page runs in your browser. The page does not send your answers to a server.</p>
       <p>Third-party license notices: <a href="../THIRD_PARTY_LICENSES.md">THIRD_PARTY_LICENSES.md</a>.</p>

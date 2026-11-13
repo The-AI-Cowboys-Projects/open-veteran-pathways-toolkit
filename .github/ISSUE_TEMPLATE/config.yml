@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security report
+    url: https://github.com/The-AI-Cowboys-Projects/open-veteran-pathways-toolkit/security/policy
+    about: Read SECURITY.md first. Email contact_us@theaicowboys.com if the report describes a working exploit against a person. Do not include personal information.
