@@ -6,6 +6,7 @@
 
 ### Added
 
+- Accessibility statement, scam-checker evaluation on a synthetic set, and a veteran usability pilot plan. Send feedback links mailto contact_us@theaicowboys.com. Issue templates for feedback and accessibility.
 - Career Pathway Translator free-text mode using 8,361 military-to-civilian phrase dictionary rows. The shipped dictionary is not the military crosswalk.
 - Scam Guardian point rubric, plus an optional on-device Gemma 3 270M model that is not required and is not precached.
 - Go-live branding, a single `THIRD_PARTY_LICENSES.md`, and stricter page and workflow security settings.

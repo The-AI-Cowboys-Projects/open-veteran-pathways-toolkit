@@ -23,7 +23,15 @@ node scripts/verify.mjs
 
 That script checks known military codes, scam fixtures, glossary and quiz shape, source links on tutor claims, checklist ids, local CSS, the manifest, the offline file list, and the absence of remote fetches in the page scripts.
 
-Browser checks, including a 360px viewport and a reload with the network off:
+Scam Guardian scores on the synthetic set:
+
+```bash
+npm run eval:scam
+```
+
+Update `docs/EVALUATION.md` from that output if the numbers move. Do not type a score the script did not print.
+
+Browser checks, including a 360px viewport, axe-core on the five pages, and a reload with the network off:
 
 ```bash
 npm ci
@@ -61,7 +69,9 @@ Keep the Apache notices with the files.
 
 ## Accessibility
 
-Keep labels on fields, a visible focus style, keyboard access, and the Larger text control. Black text on the magenta `#DD378A` and teal `#3DD8C8` brand colors is there so the contrast stays readable. Do not put white text on those colors for small type.
+Keep labels on fields, a visible focus style, keyboard access, a skip link, and the Larger text control. Black text on interface magenta `#D4348A` is 4.66:1, and that shade on white is 4.51:1. Brand teal `#3DD8C8` is for black text on a teal fill and for links on the near-black footer. Do not put teal or white text on white, and do not put white text on magenta or teal for small type. The figures and the limit of the automated checks are in `docs/ACCESSIBILITY.md`.
+
+Issue templates cover a bug, a change, feedback, and an accessibility barrier. A security report that describes a working exploit against a person goes to contact_us@theaicowboys.com, as `SECURITY.md` says. Do not put personal information in an issue.
 
 ## Security reports
 

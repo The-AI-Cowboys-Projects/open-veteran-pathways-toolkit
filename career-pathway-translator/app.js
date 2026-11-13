@@ -333,8 +333,11 @@
     const slot = document.getElementById("rank-output");
     const found = engine.rankLookup(phrases, document.getElementById("rank-branch").value, document.getElementById("rank-grade").value);
     slot.replaceChildren();
+    const heading = h("h3", { id: "rank-heading", tabindex: "-1", text: "Rank wording result" });
+    slot.append(heading);
     if (!found.length) {
       slot.append(p("Choose a branch and pay grade.", "state state-empty"));
+      heading.focus();
       return;
     }
     found.forEach(function (row) {
@@ -345,6 +348,7 @@
       box.append(p("Use this as a translation aid for scope. It is not a civil-service qualification and it is not a GS appointment."));
       slot.append(box);
     });
+    heading.focus();
   });
 
   document.getElementById("clear-history").addEventListener("click", function () {
@@ -359,8 +363,11 @@
     const slot = document.getElementById("phrase-output");
     const result = engine.translateFreeText(phrases, text);
     slot.replaceChildren();
+    const heading = h("h3", { id: "phrase-heading", tabindex: "-1", text: "Dictionary result" });
+    slot.append(heading);
     if (!result.lines.length) {
       slot.append(p("Paste a line to translate. Nothing is uploaded.", "state state-empty"));
+      heading.focus();
       return;
     }
     result.lines.forEach(function (line) {
@@ -403,6 +410,7 @@
       slot.append(box);
     }
     slot.append(p("Review every line before it goes on a résumé. This is not a job offer or a qualification finding."));
+    heading.focus();
   }
 
   document.getElementById("phrase-form").addEventListener("submit", function (event) {

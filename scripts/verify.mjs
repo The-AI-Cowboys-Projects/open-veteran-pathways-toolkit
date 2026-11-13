@@ -3,6 +3,7 @@ import path from "node:path";
 import vm from "node:vm";
 import { createRequire } from "node:module";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { evaluate } from "../eval/run.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const require = createRequire(import.meta.url);
@@ -15,6 +16,20 @@ function check(name, cond, detail) {
   }
   failed += 1;
   console.error("FAIL " + name + (detail ? " — " + detail : ""));
+}
+
+function hasExactToken(text, token) {
+  return String(text || "").split(/[\s"'<>]+/).some(function (part) {
+    return part.replace(/[),.;]+$/, "") === token;
+  });
+}
+
+function hostnameIs(url, hostname) {
+  try {
+    return new URL(url).hostname === hostname;
+  } catch (err) {
+    return false;
+  }
 }
 
 function loadAssign(file, names) {
@@ -49,7 +64,7 @@ const medic = career.searchCodes(data.OVPT_MOC, "68W", { branch: "army" });
 const medicRow = medic.results.find(function (row) { return row.code === "68W"; });
 check("68W paramedic crosswalk", Boolean(medicRow && medicRow.onet.indexOf("29-2043.00") !== -1));
 const paramedic = career.occupation(occ.OVPT_OCC, "29-2043.00");
-check("paramedic skills", Boolean(paramedic && paramedic.s.length >= 3 && paramedic.d && paramedic.u.indexOf("bls.gov") !== -1));
+check("paramedic skills", Boolean(paramedic && paramedic.s.length >= 3 && paramedic.d && (hostnameIs(paramedic.u, "www.bls.gov") || hostnameIs(paramedic.u, "bls.gov"))));
 
 const hm = career.searchCodes(data.OVPT_MOC, "HM", { branch: "navy" });
 check("HM corpsman", hm.results.some(function (row) { return row.code === "HM" && row.onet.indexOf("31-9092.00") !== -1; }));
@@ -241,7 +256,9 @@ check("ocr progress markup", fs.readFileSync(path.join(root, "scam-guardian/inde
 check("tutor export control", fs.readFileSync(path.join(root, "ai-tutor/index.html"), "utf8").indexOf('id="export-progress"') !== -1);
 const shell = fs.readFileSync(path.join(root, "shared/shell.js"), "utf8");
 check("shell registers relative worker", shell.indexOf('new URL("sw.js"') !== -1 && shell.indexOf("Add to Home Screen") !== -1);
-check("pages workflow still deploys", fs.readFileSync(path.join(root, ".github/workflows/pages.yml"), "utf8").indexOf("actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e") !== -1);
+const pagesWorkflowEarly = fs.readFileSync(path.join(root, ".github/workflows/pages.yml"), "utf8");
+check("pages workflow still deploys", pagesWorkflowEarly.indexOf("actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346") !== -1);
+check("pages upload keeps dotfiles", pagesWorkflowEarly.indexOf("include-hidden-files: true") !== -1);
 
 check("phrase dictionary shipped rows", meta.OVPT_META.phraseDictionaryShippedRows === 8361 && meta.OVPT_META.phraseDictionaryReportedRows === 34071, String(meta.OVPT_META.phraseDictionaryShippedRows));
 const shippedSum = Object.keys(meta.OVPT_META.phraseDictionaryShipped).reduce(function (sum, key) {
@@ -255,6 +272,8 @@ check("free-text translation", freeText.lines.length === 1 && /c-suite|presented
 }));
 check("free-text does not invent a dollar figure", freeText.lines[0].rewritten.indexOf("$") === -1);
 
+const protectivePay = scam.analyze(rules.OVPT_RULES, model.OVPT_SPAM_MODEL, "A real agency will not ask you to pay with a gift card. If someone does, hang up and look up the agency yourself.");
+check("negated payment warning stays low", protectivePay.level === "low" && protectivePay.hits.length === 0);
 const giftRubric = scam.messageRubric("Your benefits are suspended. Call immediately and pay with a gift card.", "messaging");
 check("scram rubric flags a payment lure", giftRubric.label === "scam" && giftRubric.points >= 3);
 const otpRubric = scam.messageRubric("Your passcode to log in is 150952. Do not share this code.", "messaging");
@@ -290,7 +309,7 @@ check("agent security citation", fs.readFileSync(path.join(root, "docs/agent-sec
 check("third-party licenses file", fs.existsSync(path.join(root, "THIRD_PARTY_LICENSES.md")) && !fs.existsSync(path.join(root, "THIRD_PARTY_NOTICES.md")));
 const licenseText = fs.readFileSync(path.join(root, "THIRD_PARTY_LICENSES.md"), "utf8");
 check("license file keeps MIT copyright lines", licenseText.indexOf("Copyright (c) 2026 Chris Simser") !== -1 && licenseText.indexOf("Copyright (c) 2025 Erfan Mirhosseini") !== -1 && licenseText.indexOf("Copyright (c) Microsoft Corporation") !== -1);
-check("license file keeps O*NET and Gemma notices", licenseText.indexOf("O*NET 31.0 Database") !== -1 && licenseText.indexOf("CC BY 4.0") !== -1 && licenseText.indexOf("https://ai.google.dev/gemma/terms") !== -1 && licenseText.indexOf("https://ai.google.dev/gemma/prohibited_use_policy") !== -1 && licenseText.indexOf("Apache License") !== -1);
+check("license file keeps O*NET and Gemma notices", licenseText.indexOf("O*NET 31.0 Database") !== -1 && licenseText.indexOf("CC BY 4.0") !== -1 && licenseText.indexOf("Apache License") !== -1 && hasExactToken(licenseText, "https://ai.google.dev/gemma/terms") && hasExactToken(licenseText, "https://ai.google.dev/gemma/prohibited_use_policy"));
 check("precache serves the license file", sw.indexOf("THIRD_PARTY_LICENSES.md") !== -1 && sw.indexOf("THIRD_PARTY_NOTICES.md") === -1);
 check("security contact", fs.readFileSync(path.join(root, "SECURITY.md"), "utf8").indexOf("contact_us@theaicowboys.com") !== -1);
 check("dependabot config", fs.existsSync(path.join(root, ".github/dependabot.yml")));
@@ -309,6 +328,9 @@ const publicTexts = [
   "docs/README.md",
   "docs/RESEARCH.md",
   "docs/agent-security-practices.md",
+  "docs/ACCESSIBILITY.md",
+  "docs/EVALUATION.md",
+  "docs/PILOT_PLAN.md",
   "components/README.md",
   "career-pathway-translator/index.html",
   "career-pathway-translator/README.md",
@@ -334,7 +356,10 @@ publicTexts.forEach(function (file) {
   if (file.endsWith(".html")) {
     check(file + " built by line", text.indexOf("Built by The AI Cowboys") !== -1);
     check(file + " safety disclaimer", text.indexOf("not affiliated") !== -1 && text.indexOf("PHI") !== -1 && text.indexOf("SPII") !== -1 && text.indexOf("CUI") !== -1);
-    check(file + " strict csp", text.indexOf("default-src 'self'") !== -1 && text.indexOf("script-src 'self' 'wasm-unsafe-eval'") !== -1 && text.indexOf("object-src 'none'") !== -1 && text.indexOf("base-uri 'self'") !== -1 && text.indexOf("form-action 'none'") !== -1 && text.indexOf("https://huggingface.co") !== -1 && text.indexOf("https://cdn-lfs.huggingface.co") !== -1 && text.indexOf("https://*.hf.co") !== -1 && text.indexOf("https://*.xethub.hf.co") !== -1 && text.indexOf('name="referrer" content="no-referrer"') !== -1);
+    const cspMatch = text.match(/Content-Security-Policy" content="([^"]*)"/);
+    const csp = cspMatch ? cspMatch[1] : "";
+    check(file + " strict csp", csp.indexOf("default-src 'self'") !== -1 && csp.indexOf("script-src 'self' 'wasm-unsafe-eval'") !== -1 && csp.indexOf("object-src 'none'") !== -1 && csp.indexOf("base-uri 'self'") !== -1 && csp.indexOf("form-action 'none'") !== -1 && hasExactToken(csp, "https://huggingface.co") && hasExactToken(csp, "https://cdn-lfs.huggingface.co") && hasExactToken(csp, "https://*.hf.co") && hasExactToken(csp, "https://*.xethub.hf.co") && text.indexOf('name="referrer" content="no-referrer"') !== -1);
+    check(file + " feedback link", text.indexOf("mailto:contact_us@theaicowboys.com?subject=") !== -1 && text.indexOf(">Send feedback<") !== -1 && text.indexOf("do%20not%20include%20personal%20information") !== -1);
     check(file + " no inline handler", !/\son[a-z]+\s*=/i.test(text));
     check(file + " no external script", !/<script[^>]+src="https?:/i.test(text));
   }
@@ -350,6 +375,9 @@ check("runtime wasm is present and not precached", fs.existsSync(path.join(root,
 
 unconfirmed.then(function (result) {
   check("model refuses without confirmation", result && result.ok === false && result.reason === "not-confirmed");
+  const evalReport = evaluate();
+  const evalDoc = fs.readFileSync(path.join(root, "docs/EVALUATION.md"), "utf8");
+  check("evaluation doc matches harness", evalReport.synthetic === true && evalReport.gemma === "not-run" && evalDoc.indexOf(evalReport.stamps.rules) !== -1 && evalDoc.indexOf(evalReport.stamps.rubric) !== -1 && evalDoc.indexOf(evalReport.stamps.sms) !== -1);
   if (failed) {
     console.error(failed + " checks failed");
     process.exit(1);

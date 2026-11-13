@@ -1,0 +1,36 @@
+name: Accessibility
+description: A page is hard to use with a keyboard, a screen reader, zoom, or contrast
+title: "a11y: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include classified information, CUI, health information, or a real Social Security number. Say which assistive technology you used if you know it.
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      placeholder: Scam Guardian
+    validations:
+      required: true
+  - type: dropdown
+    id: barrier
+    attributes:
+      label: What got in the way
+      options:
+        - Keyboard
+        - Screen reader
+        - Zoom or text size
+        - Contrast
+        - Focus
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: Name the control. Do not paste personal data from the page.
+    validations:
+      required: true

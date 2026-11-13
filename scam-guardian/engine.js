@@ -14,6 +14,8 @@
       const re = new RegExp(rule.pattern, "i");
       const match = re.exec(text);
       if (!match) return;
+      const before = text.slice(Math.max(0, match.index - 16), match.index).toLowerCase();
+      if (/\b(not|never|don't|do not|won't|will not)\b/.test(before)) return;
       hits.push({
         id: rule.id,
         title: rule.title,

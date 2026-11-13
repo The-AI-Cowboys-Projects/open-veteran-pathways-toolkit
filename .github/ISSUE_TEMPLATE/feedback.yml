@@ -1,0 +1,29 @@
+name: Feedback
+description: Something about a tool was confusing, missing, or helpful
+title: "feedback: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include classified information, CUI, health information, account numbers, or a real message that contains someone else's data. A short invented example is enough. You can also email contact_us@theaicowboys.com.
+  - type: dropdown
+    id: tool
+    attributes:
+      label: Which tool
+      options:
+        - Career Pathway Translator
+        - Scam Guardian
+        - Plain-English AI Tutor
+        - Transition Companion
+        - Landing page
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What should we know
+      description: Name the control and what you expected. Leave out personal information.
+    validations:
+      required: true

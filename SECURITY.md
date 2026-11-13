@@ -23,3 +23,11 @@ The optional Gemma model is not a security product. Its output is a suggestion f
 ## Supported use
 
 Use the files from a current release of this repository, from GitHub Pages, or from a copy you serve yourself. The Foundation is not affiliated with the Department of Defense or the Department of Veterans Affairs.
+
+## Supply chain
+
+The pages are static files. There is no application server and no secret in this repository.
+
+GitHub Actions workflows pin each action to a full commit SHA. The default token permission is `contents: read`. The Pages deploy job adds `pages: write` and `id-token: write`. The release job adds `contents: write` on that job only, so it can attach the offline zip to a tag.
+
+Dependabot opens pull requests for GitHub Actions and npm. `npm audit` is part of the test workflow and is expected to report 0 known vulnerabilities for the locked tree. Code scanning runs on the default branch through GitHub’s CodeQL setup. A finding is fixed in the code or, when it is a false positive, explained on the pull request that addresses it.
