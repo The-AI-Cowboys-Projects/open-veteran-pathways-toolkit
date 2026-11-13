@@ -290,7 +290,12 @@ check("agent security citation", fs.readFileSync(path.join(root, "docs/agent-sec
 check("third-party licenses file", fs.existsSync(path.join(root, "THIRD_PARTY_LICENSES.md")) && !fs.existsSync(path.join(root, "THIRD_PARTY_NOTICES.md")));
 const licenseText = fs.readFileSync(path.join(root, "THIRD_PARTY_LICENSES.md"), "utf8");
 check("license file keeps MIT copyright lines", licenseText.indexOf("Copyright (c) 2026 Chris Simser") !== -1 && licenseText.indexOf("Copyright (c) 2025 Erfan Mirhosseini") !== -1 && licenseText.indexOf("Copyright (c) Microsoft Corporation") !== -1);
-check("license file keeps O*NET and Gemma notices", licenseText.indexOf("O*NET 31.0 Database") !== -1 && licenseText.indexOf("CC BY 4.0") !== -1 && licenseText.indexOf("https://ai.google.dev/gemma/terms") !== -1 && licenseText.indexOf("https://ai.google.dev/gemma/prohibited_use_policy") !== -1 && licenseText.indexOf("Apache License") !== -1);
+function hasExactToken(text, token) {
+  return text.split(/[\s"'<>]+/).some(function (part) {
+    return part.replace(/;+$/, "") === token;
+  });
+}
+check("license file keeps O*NET and Gemma notices", licenseText.indexOf("O*NET 31.0 Database") !== -1 && licenseText.indexOf("CC BY 4.0") !== -1 && licenseText.indexOf("Apache License") !== -1 && hasExactToken(licenseText, "https://ai.google.dev/gemma/terms") && hasExactToken(licenseText, "https://ai.google.dev/gemma/prohibited_use_policy"));
 check("precache serves the license file", sw.indexOf("THIRD_PARTY_LICENSES.md") !== -1 && sw.indexOf("THIRD_PARTY_NOTICES.md") === -1);
 check("security contact", fs.readFileSync(path.join(root, "SECURITY.md"), "utf8").indexOf("contact_us@theaicowboys.com") !== -1);
 check("dependabot config", fs.existsSync(path.join(root, ".github/dependabot.yml")));
@@ -334,7 +339,9 @@ publicTexts.forEach(function (file) {
   if (file.endsWith(".html")) {
     check(file + " built by line", text.indexOf("Built by The AI Cowboys") !== -1);
     check(file + " safety disclaimer", text.indexOf("not affiliated") !== -1 && text.indexOf("PHI") !== -1 && text.indexOf("SPII") !== -1 && text.indexOf("CUI") !== -1);
-    check(file + " strict csp", text.indexOf("default-src 'self'") !== -1 && text.indexOf("script-src 'self' 'wasm-unsafe-eval'") !== -1 && text.indexOf("object-src 'none'") !== -1 && text.indexOf("base-uri 'self'") !== -1 && text.indexOf("form-action 'none'") !== -1 && text.indexOf("https://huggingface.co") !== -1 && text.indexOf("https://cdn-lfs.huggingface.co") !== -1 && text.indexOf("https://*.hf.co") !== -1 && text.indexOf("https://*.xethub.hf.co") !== -1 && text.indexOf('name="referrer" content="no-referrer"') !== -1);
+    const cspMatch = text.match(/Content-Security-Policy" content="([^"]*)"/);
+    const csp = cspMatch ? cspMatch[1] : "";
+    check(file + " strict csp", csp.indexOf("default-src 'self'") !== -1 && csp.indexOf("script-src 'self' 'wasm-unsafe-eval'") !== -1 && csp.indexOf("object-src 'none'") !== -1 && csp.indexOf("base-uri 'self'") !== -1 && csp.indexOf("form-action 'none'") !== -1 && hasExactToken(csp, "https://huggingface.co") && hasExactToken(csp, "https://cdn-lfs.huggingface.co") && hasExactToken(csp, "https://*.hf.co") && hasExactToken(csp, "https://*.xethub.hf.co") && text.indexOf('name="referrer" content="no-referrer"') !== -1);
     check(file + " no inline handler", !/\son[a-z]+\s*=/i.test(text));
     check(file + " no external script", !/<script[^>]+src="https?:/i.test(text));
   }
