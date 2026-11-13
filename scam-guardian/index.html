@@ -8,7 +8,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Pathways">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://huggingface.co https://cdn-lfs.huggingface.co https://cas-bridge.xethub.hf.co; worker-src 'self' blob:; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://huggingface.co https://cdn-lfs.huggingface.co https://*.hf.co https://*.xethub.hf.co; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="description" content="Built by The AI Cowboys. Check a message or screenshot on this device. It does not judge faces, voices, or video.">
   <title>Scam Guardian</title>
   <link rel="icon" href="../icons/favicon-32.png" type="image/png">
   <link rel="apple-touch-icon" href="../icons/icon-180.png">
@@ -68,12 +69,15 @@
       <h2>How the rules were chosen</h2>
       <p>The rules are original to this toolkit. They look for tactics described in public VA, VA OIG, FTC, and FBI IC3 material: benefits impersonation, pension poaching, claim fees, gift cards and wires, romance or emergency money requests, lookalike links, prize lures, and remote-access support. Each hit shows the phrase that matched and a link to a public page. The page does not download those sites when you analyze a message. It does not inspect a face, a voice, or a video, and it does not detect deepfakes.</p>
       <p>A second, optional hint comes from a small naive Bayes model trained on the SMS Spam Collection v.1 (Almeida, Gómez Hidalgo, and Yamakami, 2011). The raw text messages are not included. At a 90% cutoff, one 20% holdout of that collection had about 88% precision and 99% recall. That is promotional text-message spam from around 2011, so the hint is weak on veteran-benefits fraud. The rule score does not change because of the model.</p>
-      <p>The offline screenshot idea, the messaging, email, and other categories, and the point rubric are adapted from Scram by Erfan Mirhosseini (MIT), commit 8610b7db4b2d6f8398b5ecbef0c4a18a0e81e1bf. The rubric is a second reading. It does not change the written-rule level. Scram’s Android app and its 3.1 GB Gemma 3n weights are not included. OCR here is Tesseract.js 7 and tesseract.js-core 7, Apache-2.0, with English traineddata stored in <code>vendor/tesseract/</code>. An optional smaller Gemma model can be downloaded later on this page. It is not required.</p>
+      <p>A second reading uses a point rubric stored with this page. It does not change the written-rule level. OCR uses Tesseract.js stored in <code>vendor/tesseract/</code> and runs on this device. An optional smaller Gemma model can be downloaded later on this page. It is not required. Use of that model is subject to the Gemma Terms of Use and the Gemma Prohibited Use Policy, which the download panel links before any file is fetched.</p>
     </section>
   </main>
   <footer>
     <div class="wrap">
-      <p>The AI Cowboys Foundation is a Texas 501(c)(3) in San Antonio. This tool is not affiliated with, endorsed by, or part of the Department of Defense, the Department of Veterans Affairs, or any other government agency. Outputs are for human review. They are not legal, medical, financial, benefits, or employment advice. Never enter classified information, Controlled Unclassified Information (CUI), protected health information, Social Security numbers, or other sensitive personal information. Everything on this page runs in your browser. The page does not send your text or screenshot to a server.</p>
+      <p class="built-by">Built by The AI Cowboys</p>
+      <p>The AI Cowboys Foundation, <a href="https://www.theaicowboysfoundation.org/" rel="noopener noreferrer">www.theaicowboysfoundation.org</a>, a veteran-owned AI lab in San Antonio. The Foundation is a Texas 501(c)(3).</p>
+      <p>This tool is not affiliated with, endorsed by, or part of the Department of Defense or the Department of Veterans Affairs. Outputs are for human review. They are not legal, medical, financial, benefits, or employment advice. Never enter classified information, Controlled Unclassified Information (CUI), protected health information (PHI), or sensitive personally identifiable information (SPII). Everything on this page runs in your browser. The page does not send your text or screenshot to a server.</p>
+      <p>Third-party license notices: <a href="../THIRD_PARTY_LICENSES.md">THIRD_PARTY_LICENSES.md</a>.</p>
     </div>
   </footer>
   <script src="../shared/shell.js"></script>

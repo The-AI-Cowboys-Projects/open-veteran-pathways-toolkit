@@ -1,6 +1,6 @@
 # Code of conduct
 
-The Open Veteran Pathways Toolkit is a public project of The AI Cowboys Foundation. People who contribute, review, or ask questions are expected to keep the work usable by veterans, military families, and older adults.
+**Built by The AI Cowboys.** The Open Veteran Pathways Toolkit is a public project of The AI Cowboys Foundation, [www.theaicowboysfoundation.org](https://www.theaicowboysfoundation.org), a veteran-owned AI lab in San Antonio. People who contribute, review, or ask questions are expected to keep the work usable by veterans, military families, and older adults.
 
 ## Expected
 
@@ -18,4 +18,4 @@ The Open Veteran Pathways Toolkit is a public project of The AI Cowboys Foundati
 
 ## Reports
 
-Report conduct problems through a GitHub issue that does not include personal data, or through the contact published on the Foundation’s website. Maintainers may edit or lock a conversation that breaks this policy. This document is the project’s own short policy.
+Report conduct problems through a GitHub issue that does not include personal data, or by email to contact_us@theaicowboys.com. Maintainers may edit or lock a conversation that breaks this policy. This document is the project’s own short policy.

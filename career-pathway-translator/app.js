@@ -120,7 +120,7 @@
     const title = record ? code + " — " + record.t : code + " — not in the bundled O*NET 31.0 file";
     card.append(h("h3", { text: title }));
     if (!record) {
-      card.append(p("This code was listed on the military crosswalk or in a Debriefed note, but it is not one of the 1,016 occupations in the O*NET 31.0 file shipped here. A few dictionary notes still cite older codes, including 29-2041.00, that O*NET has since updated."));
+      card.append(p("This code was listed on the military crosswalk or in a phrase-dictionary note, but it is not one of the 1,016 occupations in the O*NET 31.0 file shipped here. A few dictionary notes still cite older codes, including 29-2041.00, that O*NET has since updated."));
       return card;
     }
     if (engine.isMilitaryOccupation(code)) {
@@ -178,11 +178,11 @@
 
     article.append(h("h3", { text: "Dictionary suggestions" }));
     if (!curated.length) {
-      article.append(p("The Debriefed dictionary does not have an extra civilian-title note for this exact code. Use the official occupation text and your own duty description. Do not invent duties you did not perform."));
+      article.append(p("The military-to-civilian phrase dictionary does not have an extra civilian-title note for this exact code. Use the official occupation text and your own duty description. Do not invent duties you did not perform."));
     }
     curated.forEach(function (item) {
       const box = h("div", { class: "card" });
-      box.append(p("Debriefed note for " + (item.branch || "this branch") + " " + item.code + (item.title ? " (" + item.title + ")" : "") + ". These are wording ideas from that MIT dictionary, not a finding that you qualify for the job."));
+      box.append(p("Phrase-dictionary note for " + (item.branch || "this branch") + " " + item.code + (item.title ? " (" + item.title + ")" : "") + ". These are wording ideas, not a finding that you qualify for the job."));
       if (item.description) box.append(p(item.description));
       if (item.civilian.length) box.append(p("Civilian titles in the dictionary: " + item.civilian.join("; ") + "."));
       if (item.skills.length) box.append(p("Skills named in the dictionary: " + item.skills.join("; ") + "."));
@@ -196,7 +196,7 @@
 
     if (bullets.length) {
       article.append(h("h3", { text: "Resume examples to rewrite" }));
-      article.append(p("These examples come from Debriefed bullet patterns that share words with this title. Replace the numbers with facts from your record. Delete any line that is not true."));
+      article.append(p("These examples come from phrase-dictionary bullet patterns that share words with this title. Replace the numbers with facts from your record. Delete any line that is not true."));
       const list = h("ul");
       bullets.forEach(function (bullet) {
         list.append(h("li", { text: bullet.text + " (" + bullet.category + ")" }));
@@ -206,7 +206,7 @@
 
     if (dutyText && duty.rewritten) {
       article.append(h("h3", { text: "Your duty wording" }));
-      article.append(p("Substitutions use the Debriefed phrase, jargon, and acronym lists. Read the result. A longer civilian phrase is not automatically better."));
+      article.append(p("Substitutions use the military-to-civilian phrase, jargon, and acronym lists. Read the result. A longer civilian phrase is not automatically better."));
       article.append(h("p", { text: duty.rewritten }));
       if (duty.replacements.length) {
         const list = h("ul");
@@ -340,7 +340,7 @@
     found.forEach(function (row) {
       const box = h("div", { class: "card" });
       box.append(h("h3", { text: row.rank + " (" + row.paygrade + ")" }));
-      box.append(p("Civilian wording in the Debriefed rank table: " + row.civilian + "."));
+      box.append(p("Civilian wording in the phrase-dictionary rank table: " + row.civilian + "."));
       box.append(p("Responsibility note: " + row.level + ". Typical team size in that table: " + row.team + ". Federal GS comparison in that table: " + row.gs + "."));
       box.append(p("Use this as a translation aid for scope. It is not a civil-service qualification and it is not a GS appointment."));
       slot.append(box);
@@ -353,7 +353,7 @@
   });
 
   const about = document.getElementById("about-counts");
-  about.textContent = meta.mocRows + " military records (" + meta.mocActive + " active) from DMDC " + meta.mocFile + ", " + meta.occupations + " O*NET 31.0 occupations, and " + meta.debriefedShippedRows + " Debriefed dictionary rows converted for this page (the upstream manifest reports " + meta.debriefedReportedRows + "). Debriefed commit " + meta.debriefedCommit + ".";
+  about.textContent = meta.mocRows + " military records (" + meta.mocActive + " active) from DMDC " + meta.mocFile + ", " + meta.occupations + " O*NET 31.0 occupations, and " + meta.phraseDictionaryShippedRows + " military-to-civilian phrase dictionary rows stored with this page.";
 
   function renderFreeText(text) {
     const slot = document.getElementById("phrase-output");

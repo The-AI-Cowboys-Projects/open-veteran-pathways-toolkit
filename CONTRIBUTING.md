@@ -1,5 +1,7 @@
 # Contributing
 
+**Built by The AI Cowboys.** The AI Cowboys Foundation, [www.theaicowboysfoundation.org](https://www.theaicowboysfoundation.org), a veteran-owned AI lab in San Antonio.
+
 Thanks for improving a tool that people may trust with a career story or a scary message. Keep changes easy to review.
 
 ## Ground rules
@@ -7,7 +9,7 @@ Thanks for improving a tool that people may trust with a career story or a scary
 - The pages stay private by default. Do not add analytics, ad pixels, remote fonts, or a call that sends typed text or screenshots off the device.
 - Runtime code should keep working from the files in the repo. A link the user chooses to open is fine. The only runtime download is the optional Gemma model, and only after the person confirms it. Do not precache those weights.
 - Do not add classified examples, real Social Security numbers, medical notes, or other people’s personal messages.
-- New third-party text or data needs a license that allows redistribution with this MIT repository. Put the notice in `THIRD_PARTY_NOTICES.md` and, when the upstream license requires a file, under that tool’s `vendor/` folder. If the license is missing or incompatible, do not copy the material. Say what you rejected in `docs/RESEARCH.md`.
+- New third-party text or data needs a license that allows redistribution with this MIT repository. Put the notice in `THIRD_PARTY_LICENSES.md` and, when the upstream license requires a file, under that tool’s `vendor/` folder. If the license is missing or incompatible, do not copy the material. Say what you rejected in `docs/RESEARCH.md`. Do not name upstream projects in user-facing pages.
 - Do not relicense O*NET, DMDC, BLS, or the SMS Spam Collection as MIT.
 - O*NET text must keep the CC BY 4.0 credit and the statement that USDOL/ETA has not approved modifications. O*NET® stays a trademark used as an adjective.
 - Write claims the way you can demonstrate them. Do not add user counts, grant awards, or partnerships.
@@ -39,7 +41,7 @@ Career files:
 python3 scripts/build_career_data.py
 ```
 
-The script downloads the DMDC zip, O*NET 31.0 CSVs, the BLS handbook crosswalk, and Debriefed’s public-data JSON at the commit named in the script. Read the diff before you commit it. Update the counts in `README.md` if they move.
+The script downloads the DMDC zip, O*NET 31.0 CSVs, the BLS handbook crosswalk, and the phrase-dictionary JSON at the commit named in the script. Read the diff before you commit it. Update the counts in `README.md` if they move. Keep the copyright notice in `THIRD_PARTY_LICENSES.md`.
 
 SMS model:
 

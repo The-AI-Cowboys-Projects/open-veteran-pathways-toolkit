@@ -1,14 +1,14 @@
 # Research notes
 
-Prepared for the Open Veteran Pathways Toolkit, an open-source project of The AI Cowboys Foundation (a Texas 501(c)(3) in San Antonio). The notes record what was checked, what was used, and what was left out. They are not a claim that a grant was awarded and not a claim of affiliation with any government agency.
+**Built by The AI Cowboys.** The AI Cowboys Foundation, [www.theaicowboysfoundation.org](https://www.theaicowboysfoundation.org), a veteran-owned AI lab in San Antonio, and a Texas 501(c)(3). The notes record what was checked, what was used, and what was left out. They are not a claim that a grant was awarded and not a claim of affiliation with any government agency.
 
 Checked on 13 November 2026 from public pages and from the files those pages link to.
 
 ## Dictionary and on-device model, same day
 
-Debriefed’s `public-data/manifest.json` at commit `7d75063a4d816ab615cdfbe8868045490837f725` reports `total_rows` 34,071 under version `2026-05-20.83b39983`. The conversion in `scripts/build_career_data.py` ships 8,361 rows: the phrasing tables, MOS notes, verbs, bullet examples, quantification helpers, industry-framing examples, professional-summary examples, and keyword lists. `onet_crosswalk.json` (24,248 rows) stays out because the DMDC CSV is the military source. Funding tables, gap recommendations with costs, and cover-letter, résumé, and LinkedIn templates stay out. The free-text box uses the dictionary substitution from Debriefed’s `translation-engine.ts` (first option before a slash, case match, longest match). It does not call the Anthropic polish step in that file.
+The phrase-dictionary snapshot at commit `7d75063a4d816ab615cdfbe8868045490837f725` reports `total_rows` 34,071 under version `2026-05-20.83b39983`. The conversion in `scripts/build_career_data.py` ships 8,361 rows: the phrasing tables, code notes, verbs, bullet examples, quantification helpers, industry-framing examples, professional-summary examples, and keyword lists. A 24,248-row occupation crosswalk stays out because the DMDC CSV is the military source. Funding tables, gap recommendations with costs, and cover-letter, résumé, and LinkedIn templates stay out. The free-text box substitutes the first option before a slash, matches case, and prefers the longest match. It does not call a remote writing service.
 
-Scram at commit `8610b7db4b2d6f8398b5ecbef0c4a18a0e81e1bf` is MIT, Copyright (c) 2025 Erfan Mirhosseini. The reusable text is the category enum and the prompts in `AppDetectorHelper.kt`. `GemmaLlmHelper.kt` in that tree is empty. The 0.85 and 0.15 values in `ScamDetectionModelHelper.kt` are constants in the parser, so this toolkit does not display them. The optional model is Gemma 3 270M Instruct ONNX, revision `2dbbfdb`, license field `gemma` on the Hugging Face card. File sizes were read from `https://huggingface.co/api/models/onnx-community/gemma-3-270m-it-ONNX/tree/main` on 13 November 2026: `onnx/model_q4f16.onnx` 330,717 bytes, `onnx/model_q4f16.onnx_data` 272,626,176 bytes, `onnx/model_quantized.onnx` 246,276 bytes, `onnx/model_quantized.onnx_data` 545,028,608 bytes, plus the tokenizer files listed in `shared/local-model.js`. Gemma 3n was not packaged. Scram’s README describes that model as 3.1 GB.
+The message rubric and prompt text are the snapshot at commit `8610b7db4b2d6f8398b5ecbef0c4a18a0e81e1bf`. The MIT notice is in `THIRD_PARTY_LICENSES.md`. Fixed parser figures of 0.85 and 0.15 are not displayed, because they are not a measured probability. The optional model is Gemma 3 270M Instruct ONNX, revision `2dbbfdb1b59bd034eb959428c6a7da9dd7ea27f0`, license field `gemma` on the Hugging Face card. Use is subject to the Gemma Terms of Use and the Gemma Prohibited Use Policy. File sizes were read from `https://huggingface.co/api/models/onnx-community/gemma-3-270m-it-ONNX/tree/main` on 13 November 2026: `onnx/model_q4f16.onnx` 330,717 bytes, `onnx/model_q4f16.onnx_data` 272,626,176 bytes, `onnx/model_quantized.onnx` 246,276 bytes, `onnx/model_quantized.onnx_data` 545,028,608 bytes, plus the tokenizer files listed in `shared/local-model.js`. A multi-gigabyte Gemma 3n build was not packaged.
 
 The tutor and companion cite Pendleton, M., et al. (2026). Agent Security Framework, Version 1.0. The AI Cowboys. CC BY 4.0. https://doi.org/10.5281/zenodo.19561360. No other author is named.
 
@@ -49,18 +49,17 @@ The repository is MIT licensed. MIT code can sit next to other material only whe
 - File: [Occupation_Handbook_to_ONET-SOC.xlsx](https://www.onetcenter.org/crosswalks/ooh/Occupation_Handbook_to_ONET-SOC.xlsx) (October 2026 update noted on that page)
 - What shipped: the handbook profile URL for an O*NET-SOC code, when the crosswalk had one. Handbook prose was not copied. BLS works are U.S. government works. The link is opened only if the user chooses it
 
-### Used: Debriefed dictionary (MIT), phrasing and curated notes
+### Used: military-to-civilian phrase dictionary (MIT)
 
-- Repository: [github.com/csimser/debriefed](https://github.com/csimser/debriefed)
-- License file: MIT, Copyright (c) 2026 Chris Simser
+- License: MIT. The copyright and permission notice is in `THIRD_PARTY_LICENSES.md`
 - Commit used: `7d75063a4d816ab615cdfbe8868045490837f725`
-- Manifest version in that tree: `2026-05-20.83b39983`, described by the project as a 33,000-plus row dictionary across many tables
-- What shipped, as a derivative kept under the MIT notice in `career-pathway-translator/vendor/debriefed/`:
-  - 493 curated code notes (`mos_to_civilian.json`) with civilian titles and skills the author recorded
+- Manifest version in that snapshot: `2026-05-20.83b39983`, a dictionary of more than 33,000 rows across many tables
+- What shipped, under that MIT notice:
+  - 493 curated code notes with civilian titles and skills recorded in the dictionary
   - 1,124 phrase translations, 745 evaluation phrases, 1,278 jargon entries of four or more characters, 1,149 acronyms, 57 rank rows, 22 soft-skill lines, strong action verbs in 17 categories, and 845 resume-bullet examples
-- What was not needed for this tool and was not copied: cover-letter templates, LinkedIn templates, funding tables, and the app’s server code
+- What was not needed for this tool and was not copied: cover-letter templates, LinkedIn templates, funding tables, and any server code
 - Four O*NET codes in the curated notes are not in the O*NET 31.0 occupation file used here: `27-3012.00`, `29-2041.00`, `31-1014.00`, `53-1047.00`. The page says when a code is missing. For 68W, the DMDC file points at current `29-2043.00` Paramedics, which is the official link shown first
-- Debriefed’s own `onet_crosswalk.json` (24,248 rows) was not used as the military source. The DMDC CSV is the upstream file and includes status, personnel category, and up to four O*NET codes. Debriefed’s MIT license would have allowed copying their JSON, but it would have been a second-hand extract
+- The snapshot’s own occupation crosswalk JSON (24,248 rows) was not used as the military source. The DMDC CSV is the upstream file and includes status, personnel category, and up to four O*NET codes. Copying that JSON would have been a second-hand extract
 
 ### Rejected for the career tool
 
@@ -96,7 +95,7 @@ Patterns covered: benefits impersonation, threats to suspend benefits, requests 
 
 - Paper: Almeida, T.A., Gómez Hidalgo, J.M., Yamakami, A. “Contributions to the Study of SMS Spam Filtering: New Collection and Results.” Proceedings of the 2011 ACM Symposium on Document Engineering (DOCENG’11)
 - Download used: [UCI archive zip](https://archive.ics.uci.edu/static/public/228/sms+spam+collection.zip)
-- License, from the collection readme: copyright Tiago Agostinho de Almeida and José María Gómez Hidalgo. The corpus may be used, modified, and redistributed with no warranty. A citation is requested. The full notice is in `THIRD_PARTY_NOTICES.md`
+- License, from the collection readme: copyright Tiago Agostinho de Almeida and José María Gómez Hidalgo. The corpus may be used, modified, and redistributed with no warranty. A citation is requested. The full notice is in `THIRD_PARTY_LICENSES.md`
 - What shipped: 617 word log-odds from a binary naive Bayes model trained on 80% of 5,160 deduplicated messages (seed 20261113; 503 spam and 3,625 ham in the training slice). The raw messages were not committed. Many ham messages are personal, and many spam messages contain phone numbers
 - Holdout (1,032 messages), at probability 0.90: precision 0.8782, recall 0.9856, 19 false positives, 2 false negatives. At 0.50, precision fell to 0.6832, so the page only mentions the model when it clears 0.90. The model does not change the rule level
 - This collection is British and Singaporean SMS from about 2011. It is a weak hint for VA pension fraud. The page says that
@@ -106,17 +105,16 @@ Patterns covered: benefits impersonation, threats to suspend benefits, requests 
 - [tesseract.js 7.0.0](https://github.com/naptha/tesseract.js), Apache License 2.0
 - [tesseract.js-core 7.0.0](https://github.com/naptha/tesseract.js-core), Apache License 2.0. Only the three LSTM builds are included: `tesseract-core-lstm.wasm.js`, `tesseract-core-simd-lstm.wasm.js`, and `tesseract-core-relaxedsimd-lstm.wasm.js`. The non-LSTM builds were left out because the page requests the LSTM engine
 - English data: `@tesseract.js-data/eng@1.0.0` file `4.0.0_best_int/eng.traineddata.gz` (about 2.8 MiB). The npm package declares MIT. The upstream [tessdata](https://github.com/tesseract-ocr/tessdata) project is Apache-2.0. Both notices are in `scam-guardian/vendor/tesseract/`
-- Bundled pieces named in the minified license files: regenerator-runtime (MIT), buffer (MIT), ieee754 (BSD-3-Clause), zlib.js (MIT)
+- Bundled pieces named in the minified license files: regenerator-runtime (MIT), buffer (MIT), ieee754 (BSD-3-Clause), zlib.js (MIT). The texts are in `THIRD_PARTY_LICENSES.md`
 - Checked in headless Chrome against a local screenshot. The worker read “benefits are suspended” and “gift card” without a network call
 - Limit: browsers block the worker when the HTML file is opened with `file://`. Pasted-text analysis works from `file://`. OCR works when the folder is served over HTTP, including a local static server. That server still does not need the public internet
 
-### Scram, credited and not copied
+### Message rubric, under its own MIT notice
 
-- Repository: [github.com/erfunm/Scram](https://github.com/erfunm/Scram)
-- License of the application code: MIT, by Erfan Mirhosseini
-- What it is: an Android app that screenshots the phone, runs on-device OCR, and asks Gemma 3n (about 3.1 GB in the README) to judge the text. The author’s Kaggle write-up describes a rule-style prompt around Gemma 3n E2B
-- Why the code was not imported: it is Kotlin for Android, and the useful model is Gemma. [Gemma Terms of Use](https://ai.google.dev/gemma/terms) are not the MIT license. They allow use under use-restrictions that must be passed on, and the weights are far too large for this static toolkit
-- What was taken from the idea, without copying code: a screenshot stays on the device, text is read locally, and the result explains the reason. The rules here are a new set aimed at veteran and older-adult fraud, not Scram’s prompt
+- License of the rubric and prompt text: MIT. The copyright and permission notice is in `THIRD_PARTY_LICENSES.md`
+- Snapshot commit: `8610b7db4b2d6f8398b5ecbef0c4a18a0e81e1bf`
+- The Android application was not imported. A multi-gigabyte Gemma build described with that application was not packaged. [Gemma Terms of Use](https://ai.google.dev/gemma/terms) and the [Prohibited Use Policy](https://ai.google.dev/gemma/prohibited_use_policy) are not the MIT license. Use of the optional smaller model is subject to those terms, and the page passes them along before download
+- What this page does: a screenshot stays on the device, text is read locally, and the result explains the reason. The written rules are original and aimed at veteran and older-adult fraud. The point rubric is a second reading and does not change the written-rule level
 
 ### Rejected for Scam Guardian
 
@@ -154,5 +152,5 @@ HTTP checks from this build environment returned 200 for the VA.gov, DOL, TAP, S
 
 ## Other projects considered
 
-- Debriefed’s single-file app download is a full resume product with optional calls to Anthropic. Reusing that shell would have pulled an API path into a toolkit that promises no runtime network calls. The dictionary was the part that belonged here
+- A single-file résumé product with optional remote model calls was not reused. That shell would have pulled an API path into a toolkit that promises no runtime network calls for typed text. The phrase dictionary was the part copied, under the MIT notice in `THIRD_PARTY_LICENSES.md`
 - In-browser LLM runtimes (WebLLM, transformers.js) remain a possible later experiment if a small, permissively licensed model is trained on text this project has the right to use. They are not required for the four tools to function, and they were not vendored

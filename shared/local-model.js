@@ -35,6 +35,7 @@
       revision: REVISION,
       license: "gemma",
       termsUrl: "https://ai.google.dev/gemma/terms",
+      prohibitedUrl: "https://ai.google.dev/gemma/prohibited_use_policy",
       modelCard: "https://huggingface.co/" + REPO,
       runtime: "Transformers.js 4.3.2 with onnxruntime-web 1.31.0-dev.20260914-8d85527a0",
       runtimeLicense: "Apache-2.0 for Transformers.js; MIT for onnxruntime-web",
@@ -170,13 +171,20 @@
     container.append(size);
     var license = document.createElement("p");
     license.id = "model-license";
-    license.append(document.createTextNode(info.name + " (" + info.repo + ", revision " + info.revision.slice(0, 12) + ") is published under the Gemma Terms of Use, not MIT and not Apache-2.0. "));
+    license.append(document.createTextNode(info.name + " (" + info.repo + ", revision " + info.revision + ") is published under the Gemma Terms of Use, not MIT and not Apache-2.0. Use is subject to the Gemma Terms of Use and the Gemma Prohibited Use Policy. Those terms pass along with any use of the model. "));
     var link = document.createElement("a");
     link.href = info.termsUrl;
     link.textContent = "Gemma terms";
     link.rel = "noopener noreferrer";
     link.target = "_blank";
     license.append(link);
+    license.append(document.createTextNode(" "));
+    var prohibited = document.createElement("a");
+    prohibited.href = info.prohibitedUrl;
+    prohibited.textContent = "Prohibited Use Policy";
+    prohibited.rel = "noopener noreferrer";
+    prohibited.target = "_blank";
+    license.append(prohibited);
     license.append(document.createTextNode(". The model card lists the license as gemma. The browser runtime stored with this toolkit is " + info.runtime + " (" + info.runtimeLicense + "). "));
     var card = document.createElement("a");
     card.href = info.modelCard;

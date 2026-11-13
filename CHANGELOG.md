@@ -1,11 +1,14 @@
 # Changelog
 
+**Built by The AI Cowboys.** The AI Cowboys Foundation, www.theaicowboysfoundation.org, a veteran-owned AI lab in San Antonio.
+
 ## Unreleased
 
 ### Added
 
-- Career Pathway Translator free-text mode using 8,361 Debriefed dictionary rows. Debriefed’s manifest reports 34,071 rows; the 24,248-row crosswalk file is not shipped.
-- Scam Guardian rubric and prompts adapted from Scram, plus an optional on-device Gemma 3 270M model that is not required and is not precached.
+- Career Pathway Translator free-text mode using 8,361 military-to-civilian phrase dictionary rows. The shipped dictionary is not the military crosswalk.
+- Scam Guardian point rubric, plus an optional on-device Gemma 3 270M model that is not required and is not precached.
+- Go-live branding, a single `THIRD_PARTY_LICENSES.md`, and stricter page and workflow security settings.
 - Tutor passage search and the same optional model, limited to the tutor’s own sourced text. Least-agency notes for the tutor and the companion, citing Pendleton, M., et al. (2026).
 - SECURITY.md, CODE_OF_CONDUCT.md, issue and pull request templates, and an offline zip workflow.
 

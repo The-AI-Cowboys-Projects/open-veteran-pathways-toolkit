@@ -241,27 +241,27 @@ check("ocr progress markup", fs.readFileSync(path.join(root, "scam-guardian/inde
 check("tutor export control", fs.readFileSync(path.join(root, "ai-tutor/index.html"), "utf8").indexOf('id="export-progress"') !== -1);
 const shell = fs.readFileSync(path.join(root, "shared/shell.js"), "utf8");
 check("shell registers relative worker", shell.indexOf('new URL("sw.js"') !== -1 && shell.indexOf("Add to Home Screen") !== -1);
-check("pages workflow still deploys", fs.readFileSync(path.join(root, ".github/workflows/pages.yml"), "utf8").indexOf("actions/deploy-pages@v4") !== -1);
+check("pages workflow still deploys", fs.readFileSync(path.join(root, ".github/workflows/pages.yml"), "utf8").indexOf("actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e") !== -1);
 
-check("debriefed shipped rows", meta.OVPT_META.debriefedShippedRows === 8361 && meta.OVPT_META.debriefedReportedRows === 34071, String(meta.OVPT_META.debriefedShippedRows));
-const shippedSum = Object.keys(meta.OVPT_META.debriefedShipped).reduce(function (sum, key) {
-  return sum + meta.OVPT_META.debriefedShipped[key];
+check("phrase dictionary shipped rows", meta.OVPT_META.phraseDictionaryShippedRows === 8361 && meta.OVPT_META.phraseDictionaryReportedRows === 34071, String(meta.OVPT_META.phraseDictionaryShippedRows));
+const shippedSum = Object.keys(meta.OVPT_META.phraseDictionaryShipped).reduce(function (sum, key) {
+  return sum + meta.OVPT_META.phraseDictionaryShipped[key];
 }, 0);
-check("debriefed shipped sum", shippedSum === meta.OVPT_META.debriefedShippedRows);
-check("crosswalk not shipped as the military source", meta.OVPT_META.debriefedNotShipped.onet_crosswalk === 24248);
+check("phrase dictionary shipped sum", shippedSum === meta.OVPT_META.phraseDictionaryShippedRows);
+check("crosswalk not shipped as the military source", meta.OVPT_META.phraseDictionaryNotShipped.onet_crosswalk === 24248);
 const freeText = career.translateFreeText(phrases.OVPT_PHRASES, "I briefed flag officers and supervised personnel.");
 check("free-text translation", freeText.lines.length === 1 && /c-suite|presented/i.test(freeText.lines[0].rewritten) && freeText.lines[0].replacements.some(function (hit) {
   return hit.from.toLowerCase() === "personnel";
 }));
 check("free-text does not invent a dollar figure", freeText.lines[0].rewritten.indexOf("$") === -1);
 
-const giftRubric = scam.scramRubric("Your benefits are suspended. Call immediately and pay with a gift card.", "messaging");
+const giftRubric = scam.messageRubric("Your benefits are suspended. Call immediately and pay with a gift card.", "messaging");
 check("scram rubric flags a payment lure", giftRubric.label === "scam" && giftRubric.points >= 3);
-const otpRubric = scam.scramRubric("Your passcode to log in is 150952. Do not share this code.", "messaging");
+const otpRubric = scam.messageRubric("Your passcode to log in is 150952. Do not share this code.", "messaging");
 check("scram rubric spares a do-not-share code", otpRubric.label === "not_scam" && otpRubric.points < 3);
 const parsedSuggestion = scam.parseModelSuggestion('{"label":"scam","reason":"asks for a gift card"}');
 check("model suggestion has no measured probability", parsedSuggestion.label === "scam" && parsedSuggestion.measured === false && parsedSuggestion.probability === undefined);
-const prompt = scam.scramPrompt("messaging", "hello");
+const prompt = scam.messagePrompt("messaging", "hello");
 check("scram prompt stays on scam text", prompt.indexOf("deepfake") !== -1 && prompt.indexOf("phishing") !== -1 && prompt.indexOf("0.85") === -1);
 check("rules still ignore the rubric", scam.analyze(rules.OVPT_RULES, model.OVPT_SPAM_MODEL, "Reminder: Your VA clinic appointment is Tuesday at 10 a.m. Bring a photo ID.").level === "low");
 
@@ -287,6 +287,65 @@ check("no old pages host", !/rogerthenomad/.test(fs.readFileSync(path.join(root,
   check("packaging file " + file, fs.existsSync(path.join(root, file)));
 });
 check("agent security citation", fs.readFileSync(path.join(root, "docs/agent-security-practices.md"), "utf8").indexOf("Pendleton, M., et al. (2026)") !== -1);
+check("third-party licenses file", fs.existsSync(path.join(root, "THIRD_PARTY_LICENSES.md")) && !fs.existsSync(path.join(root, "THIRD_PARTY_NOTICES.md")));
+const licenseText = fs.readFileSync(path.join(root, "THIRD_PARTY_LICENSES.md"), "utf8");
+check("license file keeps MIT copyright lines", licenseText.indexOf("Copyright (c) 2026 Chris Simser") !== -1 && licenseText.indexOf("Copyright (c) 2025 Erfan Mirhosseini") !== -1 && licenseText.indexOf("Copyright (c) Microsoft Corporation") !== -1);
+check("license file keeps O*NET and Gemma notices", licenseText.indexOf("O*NET 31.0 Database") !== -1 && licenseText.indexOf("CC BY 4.0") !== -1 && licenseText.indexOf("https://ai.google.dev/gemma/terms") !== -1 && licenseText.indexOf("https://ai.google.dev/gemma/prohibited_use_policy") !== -1 && licenseText.indexOf("Apache License") !== -1);
+check("precache serves the license file", sw.indexOf("THIRD_PARTY_LICENSES.md") !== -1 && sw.indexOf("THIRD_PARTY_NOTICES.md") === -1);
+check("security contact", fs.readFileSync(path.join(root, "SECURITY.md"), "utf8").indexOf("contact_us@theaicowboys.com") !== -1);
+check("dependabot config", fs.existsSync(path.join(root, ".github/dependabot.yml")));
+const modelSource = fs.readFileSync(path.join(root, "shared/local-model.js"), "utf8");
+check("model revision is pinned", /var REVISION = "2dbbfdb1b59bd034eb959428c6a7da9dd7ea27f0"/.test(modelSource) && modelSource.indexOf("confirmed !== true") !== -1);
+const creditBan = /Debriefed|Chris Simser|\bScram\b|Mirhosseini|csimser|erfunm|forked from|inspired by|adapted from/i;
+const publicTexts = [
+  "README.md",
+  "CONTRIBUTING.md",
+  "CHANGELOG.md",
+  "SECURITY.md",
+  "CODE_OF_CONDUCT.md",
+  "index.html",
+  "package.json",
+  "manifest.webmanifest",
+  "docs/README.md",
+  "docs/RESEARCH.md",
+  "docs/agent-security-practices.md",
+  "components/README.md",
+  "career-pathway-translator/index.html",
+  "career-pathway-translator/README.md",
+  "career-pathway-translator/app.js",
+  "career-pathway-translator/engine.js",
+  "scam-guardian/index.html",
+  "scam-guardian/README.md",
+  "scam-guardian/app.js",
+  "scam-guardian/engine.js",
+  "ai-tutor/index.html",
+  "ai-tutor/README.md",
+  "ai-tutor/app.js",
+  "ai-tutor/data/content.js",
+  "transition-companion/index.html",
+  "transition-companion/README.md",
+  "transition-companion/app.js",
+  "shared/shell.js",
+  "shared/local-model.js",
+];
+publicTexts.forEach(function (file) {
+  const text = fs.readFileSync(path.join(root, file), "utf8");
+  check(file + " names no upstream project", !creditBan.test(text));
+  if (file.endsWith(".html")) {
+    check(file + " built by line", text.indexOf("Built by The AI Cowboys") !== -1);
+    check(file + " safety disclaimer", text.indexOf("not affiliated") !== -1 && text.indexOf("PHI") !== -1 && text.indexOf("SPII") !== -1 && text.indexOf("CUI") !== -1);
+    check(file + " strict csp", text.indexOf("default-src 'self'") !== -1 && text.indexOf("script-src 'self' 'wasm-unsafe-eval'") !== -1 && text.indexOf("object-src 'none'") !== -1 && text.indexOf("base-uri 'self'") !== -1 && text.indexOf("form-action 'none'") !== -1 && text.indexOf("https://huggingface.co") !== -1 && text.indexOf("https://cdn-lfs.huggingface.co") !== -1 && text.indexOf("https://*.hf.co") !== -1 && text.indexOf("https://*.xethub.hf.co") !== -1 && text.indexOf('name="referrer" content="no-referrer"') !== -1);
+    check(file + " no inline handler", !/\son[a-z]+\s*=/i.test(text));
+    check(file + " no external script", !/<script[^>]+src="https?:/i.test(text));
+  }
+});
+[".github/workflows/pages.yml", ".github/workflows/test.yml", ".github/workflows/release-zip.yml"].forEach(function (file) {
+  const text = fs.readFileSync(path.join(root, file), "utf8");
+  check(file + " pins actions", !/uses: [^@\n]+@v\d/.test(text));
+  check(file + " defaults to contents read", text.indexOf("contents: read") !== -1);
+});
+const pagesWorkflow = fs.readFileSync(path.join(root, ".github/workflows/pages.yml"), "utf8");
+check("deploy job has pages write", /deploy:[\s\S]*pages: write/.test(pagesWorkflow) && /deploy:[\s\S]*id-token: write/.test(pagesWorkflow));
 check("runtime wasm is present and not precached", fs.existsSync(path.join(root, "shared/vendor/transformers/ort-wasm-simd-threaded.jsep.wasm")) && sw.indexOf("ort-wasm") === -1);
 
 unconfirmed.then(function (result) {

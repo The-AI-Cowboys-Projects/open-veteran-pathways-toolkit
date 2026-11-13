@@ -123,7 +123,7 @@
     return key.endsWith(".va.gov") || key.endsWith(".mil") && key.indexOf("va") !== -1;
   }
 
-  function scramRubric(text, category) {
+  function messageRubric(text, category) {
     const source = String(text || "");
     const lower = source.toLowerCase();
     const kind = category === "email" || category === "other" ? category : "messaging";
@@ -158,7 +158,7 @@
         threshold: 2,
         label: yes >= 2 ? "scam" : "not_scam",
         hits: hits,
-        note: "Email checklist adapted from Scram’s email prompt. Two or more matches follow that prompt’s decision rule. It does not change the written-rule level on this page.",
+        note: "Email checklist stored with this page. Two or more matches follow that checklist’s decision rule. It does not change the written-rule level on this page.",
       };
     }
 
@@ -178,12 +178,12 @@
       label: points >= 3 ? "scam" : "not_scam",
       hits: hits,
       note: kind === "other"
-        ? "General scam and phishing checklist adapted from Scram’s general prompt. A point total is the messaging rubric, shown for a person to read. It does not change the written-rule level."
-        : "Messaging rubric adapted from Scram’s messaging prompt (3 or more points follows that prompt’s decision rule). It does not change the written-rule level on this page.",
+        ? "General scam and phishing checklist stored with this page. A point total is the messaging rubric, shown for a person to read. It does not change the written-rule level."
+        : "Messaging rubric stored with this page (3 or more points follows that rubric’s decision rule). It does not change the written-rule level on this page.",
     };
   }
 
-  function scramPrompt(category, text) {
+  function messagePrompt(category, text) {
     const kind = category === "email" || category === "other" ? category : "messaging";
     const clipped = String(text || "").slice(0, 4000);
     const shared = [
@@ -196,7 +196,7 @@
     if (kind === "email") {
       return shared.concat([
         "The text is an email, which may have come from OCR. Grammar mistakes alone are not a scam.",
-        "Use Scram’s email checklist: sensitive-information request; urgency or threat; reward, job, or fake invoice; mismatched sender or shady link.",
+        "Use this email checklist: sensitive-information request; urgency or threat; reward, job, or fake invoice; mismatched sender or shady link.",
         "If two or more apply, label scam. Otherwise not_scam.",
         "Email:",
         clipped,
@@ -262,8 +262,8 @@
     analyze: analyze,
     levelFor: levelFor,
     modelScore: modelScore,
-    scramRubric: scramRubric,
-    scramPrompt: scramPrompt,
+    messageRubric: messageRubric,
+    messagePrompt: messagePrompt,
     parseModelSuggestion: parseModelSuggestion,
   };
 });
