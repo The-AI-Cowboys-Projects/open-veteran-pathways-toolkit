@@ -4,10 +4,13 @@ The AI Cowboys Foundation’s code and original tutor and checklist text are und
 
 ## Debriefed
 
-Career phrasing, curated military-code notes, rank wording, jargon, acronyms, and resume-bullet examples are derived from Debriefed.
+Career phrasing and the offline dictionary rows used by the translator are derived from Debriefed.
 
 - https://github.com/csimser/debriefed
 - Commit `7d75063a4d816ab615cdfbe8868045490837f725`
+- Manifest `2026-05-20.83b39983` reports `total_rows` 34,071. A copy of that manifest is in [career-pathway-translator/vendor/debriefed/manifest.json](career-pathway-translator/vendor/debriefed/manifest.json)
+- This toolkit ships 8,361 of those rows in `career-pathway-translator/data/phrases.js`: 493 MOS notes, 1,124 phrase translations, 745 evaluation phrases, 1,675 jargon entries, 1,149 acronyms, 57 ranks, 22 soft skills, 1,109 action verbs, 845 bullet examples, 24 quantification helpers, 36 industry-framing examples, 404 professional-summary examples, and 678 keyword lists
+- Not shipped from that manifest: `onet_crosswalk` (24,248; the DMDC file is the military source), `onet_occupations` (427; O*NET 31.0 is used instead), cover-letter, résumé, and LinkedIn templates, funding tables, and gap recommendations that state costs and discounts this toolkit does not verify
 - MIT License. Copyright (c) 2026 Chris Simser
 - Full text: [career-pathway-translator/vendor/debriefed/LICENSE](career-pathway-translator/vendor/debriefed/LICENSE)
 - The MIT grant covers Chris Simser’s dictionary. It does not relicense DMDC or O*NET facts that this toolkit shows beside that dictionary
@@ -60,11 +63,35 @@ Apache License 2.0 texts: [LICENSE.tesseract.js.md](scam-guardian/vendor/tessera
 
 ## Scram
 
-Scram is not included. It is credited because the screenshot-on-device approach is the same kind of tool.
+The messaging, email, and other categories, the messaging point rubric, the email checklist, and the general scam prompt are adapted from Scram. The Android application is not included.
 
 - https://github.com/erfunm/Scram
-- MIT License, Erfan Mirhosseini
-- The app’s Gemma 3n weights are under Google’s Gemma Terms of Use, not MIT, and are not in this repository
+- Commit `8610b7db4b2d6f8398b5ecbef0c4a18a0e81e1bf`
+- MIT License. Copyright (c) 2025 Erfan Mirhosseini
+- Full text: [scam-guardian/vendor/scram/LICENSE](scam-guardian/vendor/scram/LICENSE)
+- The parser in `ScamDetectionModelHelper.kt` assigns 0.85 or 0.15 after a label. Those figures are not a measured probability and are not shown here
+- Scram’s README describes a 3.1 GB Gemma 3n model. Those weights are not in the Scram repository and are not in this one
+
+## Optional Gemma 3 270M model
+
+Not shipped in the repository. Downloaded only after the person chooses the button that states the size.
+
+- Repository: https://huggingface.co/onnx-community/gemma-3-270m-it-ONNX
+- Revision `2dbbfdb1b59bd034eb959428c6a7da9dd7ea27f0`
+- Hugging Face model card license field: `gemma`
+- Terms: https://ai.google.dev/gemma/terms
+- WebGPU `q4f16` files plus tokenizer files: 297,975,376 bytes
+- WASM `q8` (`model_quantized`) files plus the same tokenizer files: 570,293,367 bytes
+- Browser cache name used by the runtime: `transformers-cache`
+- Not part of the service-worker precache
+
+## Transformers.js and ONNX Runtime Web
+
+Stored under [shared/vendor/transformers/](shared/vendor/transformers/) so the optional model can run without a script CDN. Loaded only after the person chooses the download. Not precached.
+
+- `@huggingface/transformers` 4.3.2, Apache License 2.0. [LICENSE.transformers](shared/vendor/transformers/LICENSE.transformers)
+- `onnxruntime-web` 1.31.0-dev.20260914-8d85527a0, MIT. Copyright (c) Microsoft Corporation. [LICENSE.onnxruntime](shared/vendor/transformers/LICENSE.onnxruntime)
+- `transformers.web.js` was edited so its ONNX import and wasm path point at this folder
 
 ## Not included
 

@@ -281,4 +281,76 @@
   renderGlossary();
   renderLessons();
   renderProgress();
+
+  let lastPassages = [];
+  let localGenerate = null;
+  const askForm = document.getElementById("ask-form");
+  const askOutput = document.getElementById("ask-output");
+  const askModel = document.getElementById("ask-model");
+  const modelAnswer = document.getElementById("model-answer");
+  if (window.LocalModel) {
+    window.LocalModel.mount(document.getElementById("model-panel"), {
+      purpose: "tutor",
+      onReady: function (result) {
+        localGenerate = result.generate;
+        if (askModel) askModel.disabled = false;
+      },
+    });
+  }
+  function renderPassages(passages) {
+    askOutput.replaceChildren();
+    if (!passages.length) {
+      askOutput.append(h("p", { class: "state state-empty", text: "No lesson or glossary passage matched those words. Try a term from the glossary." }));
+      return;
+    }
+    passages.forEach(function (item) {
+      const card = h("article", { class: "card" });
+      card.append(h("h3", { text: item.title }));
+      card.append(h("p", { text: item.text }));
+      card.append(h("p", { text: "Passage " + item.id }));
+      const line = sourceLine({ source: item.source, sourceName: item.sourceName });
+      if (line) card.append(line);
+      askOutput.append(card);
+    });
+  }
+  if (askForm && window.TutorRetrieve) {
+    askForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      lastPassages = window.TutorRetrieve.retrieve(data, document.getElementById("ask").value, 4);
+      renderPassages(lastPassages);
+    });
+  }
+  if (askModel) {
+    askModel.addEventListener("click", function () {
+      modelAnswer.replaceChildren();
+      if (!localGenerate) {
+        modelAnswer.append(h("p", { class: "state state-empty", text: "The model is not on this device. The passages above are the answer source. Read those." }));
+        return;
+      }
+      const question = document.getElementById("ask").value.trim();
+      if (!lastPassages.length) {
+        modelAnswer.append(h("p", { class: "state state-empty", text: "Find sourced passages first. The model is limited to those passages." }));
+        return;
+      }
+      modelAnswer.append(h("p", { class: "state state-loading", text: "The model is phrasing an answer from the passages on this device." }));
+      const prompt = window.TutorRetrieve.tutorPrompt(question, lastPassages);
+      localGenerate(prompt).then(function (raw) {
+        const cited = lastPassages.some(function (item) { return String(raw || "").indexOf(item.id) !== -1; });
+        modelAnswer.replaceChildren();
+        const box = h("div", { class: "warning" });
+        box.append(h("h3", { text: "Model suggestion for human review" }));
+        box.append(h("p", { text: String(raw || "").trim() || "The model returned no text." }));
+        box.append(h("p", { text: cited
+          ? "The suggestion names a passage id from the list above. Check that the sentence matches that passage."
+          : "The suggestion did not name a passage id from the list above. Do not use it." }));
+        lastPassages.forEach(function (item) {
+          const line = sourceLine({ source: item.source, sourceName: item.sourceName || item.id });
+          if (line) box.append(line);
+        });
+        modelAnswer.append(box);
+      }).catch(function () {
+        modelAnswer.replaceChildren(h("p", { class: "state state-error", role: "alert", text: "The model did not finish. The passages above are unchanged." }));
+      });
+    });
+  }
 })();

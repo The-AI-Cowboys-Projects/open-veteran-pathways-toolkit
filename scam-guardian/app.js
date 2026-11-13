@@ -96,6 +96,17 @@
       }
       output.append(note);
     }
+    const channel = document.getElementById("channel");
+    const rubric = engine.scramRubric(document.getElementById("text").value, channel ? channel.value : "messaging");
+    const rubricBox = h("div", { class: "callout", id: "scram-rubric" });
+    rubricBox.append(h("h3", { text: "Scram rubric suggestion" }));
+    rubricBox.append(h("p", { text: rubric.note }));
+    rubricBox.append(h("p", { text: "Score " + rubric.points + " (the prompt’s cutoff is " + rubric.threshold + "). Label from that rule: " + rubric.label + ". This is not a measured probability and it does not change the concern level above." }));
+    if (!rubric.hits.length) rubricBox.append(h("p", { text: "None of the rubric lines matched." }));
+    rubric.hits.forEach(function (hit) {
+      rubricBox.append(h("p", { text: (hit.points > 0 ? "+" : "") + hit.points + " " + hit.label }));
+    });
+    output.append(rubricBox);
     heading.focus();
   }
 
@@ -114,6 +125,44 @@
     event.preventDefault();
     render(engine.analyze(rules, model, document.getElementById("text").value));
   });
+
+  let localGenerate = null;
+  const modelPanel = document.getElementById("model-panel");
+  if (window.LocalModel && modelPanel) {
+    window.LocalModel.mount(modelPanel, {
+      purpose: "scam",
+      onReady: function (result) { localGenerate = result.generate; },
+    });
+    const ask = h("button", { type: "button", id: "model-ask", text: "Ask the on-device model about the text above" });
+    modelPanel.append(ask);
+    const suggestion = h("div", { id: "model-suggestion", "aria-live": "polite" });
+    modelPanel.append(suggestion);
+    ask.addEventListener("click", function () {
+      suggestion.replaceChildren();
+      if (!localGenerate) {
+        suggestion.append(h("p", { class: "state state-empty", text: "The model is not on this device. The rules and the rubric above still ran without it." }));
+        return;
+      }
+      const text = document.getElementById("text").value.trim();
+      if (text.length < 8) {
+        suggestion.append(h("p", { class: "state state-empty", text: "Paste a message first. The model is optional." }));
+        return;
+      }
+      suggestion.append(h("p", { class: "state state-loading", text: "The model is reading the text on this device." }));
+      const channel = document.getElementById("channel");
+      localGenerate(engine.scramPrompt(channel ? channel.value : "messaging", text)).then(function (raw) {
+        const parsed = engine.parseModelSuggestion(raw);
+        suggestion.replaceChildren();
+        const box = h("div", { class: "warning" });
+        box.append(h("h3", { text: "Model suggestion for human review" }));
+        box.append(h("p", { text: "Label: " + parsed.label + ". " + parsed.reason }));
+        box.append(h("p", { text: "This is not a measured probability, not a clearance, and not a decision. Scope: scam and phishing text only." }));
+        suggestion.append(box);
+      }).catch(function () {
+        suggestion.replaceChildren(h("p", { class: "state state-error", role: "alert", text: "The model did not finish. The rules above are unchanged." }));
+      });
+    });
+  }
 
   imageInput.addEventListener("change", function (event) {
     const file = event.target.files && event.target.files[0];

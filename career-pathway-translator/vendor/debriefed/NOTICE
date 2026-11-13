@@ -2,13 +2,24 @@ Debriefed dictionary extracts
 
 Source: https://github.com/csimser/debriefed
 Commit: 7d75063a4d816ab615cdfbe8868045490837f725
+Manifest: 2026-05-20.83b39983
+That manifest reports total_rows 34071.
 License: MIT. Copyright (c) 2026 Chris Simser.
 See LICENSE in this folder. The MIT license applies to Chris Simser's
 dictionary software and phrasing. It does not relicense U.S. government
 or O*NET data that may appear alongside it.
 
-Files derived for this toolkit (phrasing, curated MOS notes, ranks,
-acronyms, resume-bullet examples, and action verbs) are transformations
-of the public-data JSON in that commit. Occupation facts shown next to
-them come from the DMDC crosswalk and the O*NET 31.0 Database, which
-keep their own terms. See THIRD_PARTY_NOTICES.md.
+The page uses a conversion of the public-data JSON in that commit:
+phrase translations, evaluation phrases, jargon, acronyms, MOS notes,
+ranks, soft skills, action verbs, resume-bullet examples, quantification
+helpers, industry-framing examples, professional-summary examples, and
+keyword lists. The conversion is career-pathway-translator/data/phrases.js.
+manifest.json in this folder is the upstream row manifest, unmodified.
+
+Not converted into the page: onet_crosswalk.json (the DMDC file is the
+military source), onet-occupations.json (O*NET 31.0 is used instead),
+cover-letter and resume and LinkedIn templates, funding tables, and
+gap recommendations that state costs and discounts this toolkit does
+not verify. Occupation facts shown next to the dictionary come from
+the DMDC crosswalk and the O*NET 31.0 Database, which keep their own
+terms. See THIRD_PARTY_NOTICES.md.

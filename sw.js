@@ -1,5 +1,5 @@
 /* Offline cache for the toolkit. Paths are relative to this file so a subpath host works. */
-var CACHE = "ovpt-static-v1";
+var CACHE = "ovpt-static-v2";
 var PRECACHE = [
   "index.html",
   "manifest.webmanifest",
@@ -23,6 +23,7 @@ var PRECACHE = [
   "career-pathway-translator/data/phrases.js",
   "career-pathway-translator/vendor/debriefed/LICENSE",
   "career-pathway-translator/vendor/debriefed/NOTICE",
+  "career-pathway-translator/vendor/debriefed/manifest.json",
   "scam-guardian/index.html",
   "scam-guardian/styles.css",
   "scam-guardian/app.js",
@@ -36,10 +37,15 @@ var PRECACHE = [
   "scam-guardian/vendor/tesseract/core/tesseract-core-simd-lstm.wasm.js",
   "scam-guardian/vendor/tesseract/core/tesseract-core-relaxedsimd-lstm.wasm.js",
   "scam-guardian/vendor/tesseract/NOTICE",
+  "scam-guardian/vendor/scram/LICENSE",
+  "scam-guardian/vendor/scram/NOTICE",
+  "shared/local-model.js",
   "ai-tutor/index.html",
   "ai-tutor/styles.css",
   "ai-tutor/app.js",
   "ai-tutor/data/content.js",
+  "ai-tutor/retrieve.js",
+  "docs/agent-security-practices.md",
   "transition-companion/index.html",
   "transition-companion/styles.css",
   "transition-companion/app.js",

@@ -243,8 +243,60 @@ const shell = fs.readFileSync(path.join(root, "shared/shell.js"), "utf8");
 check("shell registers relative worker", shell.indexOf('new URL("sw.js"') !== -1 && shell.indexOf("Add to Home Screen") !== -1);
 check("pages workflow still deploys", fs.readFileSync(path.join(root, ".github/workflows/pages.yml"), "utf8").indexOf("actions/deploy-pages@v4") !== -1);
 
-if (failed) {
-  console.error(failed + " checks failed");
+check("debriefed shipped rows", meta.OVPT_META.debriefedShippedRows === 8361 && meta.OVPT_META.debriefedReportedRows === 34071, String(meta.OVPT_META.debriefedShippedRows));
+const shippedSum = Object.keys(meta.OVPT_META.debriefedShipped).reduce(function (sum, key) {
+  return sum + meta.OVPT_META.debriefedShipped[key];
+}, 0);
+check("debriefed shipped sum", shippedSum === meta.OVPT_META.debriefedShippedRows);
+check("crosswalk not shipped as the military source", meta.OVPT_META.debriefedNotShipped.onet_crosswalk === 24248);
+const freeText = career.translateFreeText(phrases.OVPT_PHRASES, "I briefed flag officers and supervised personnel.");
+check("free-text translation", freeText.lines.length === 1 && /c-suite|presented/i.test(freeText.lines[0].rewritten) && freeText.lines[0].replacements.some(function (hit) {
+  return hit.from.toLowerCase() === "personnel";
+}));
+check("free-text does not invent a dollar figure", freeText.lines[0].rewritten.indexOf("$") === -1);
+
+const giftRubric = scam.scramRubric("Your benefits are suspended. Call immediately and pay with a gift card.", "messaging");
+check("scram rubric flags a payment lure", giftRubric.label === "scam" && giftRubric.points >= 3);
+const otpRubric = scam.scramRubric("Your passcode to log in is 150952. Do not share this code.", "messaging");
+check("scram rubric spares a do-not-share code", otpRubric.label === "not_scam" && otpRubric.points < 3);
+const parsedSuggestion = scam.parseModelSuggestion('{"label":"scam","reason":"asks for a gift card"}');
+check("model suggestion has no measured probability", parsedSuggestion.label === "scam" && parsedSuggestion.measured === false && parsedSuggestion.probability === undefined);
+const prompt = scam.scramPrompt("messaging", "hello");
+check("scram prompt stays on scam text", prompt.indexOf("deepfake") !== -1 && prompt.indexOf("phishing") !== -1 && prompt.indexOf("0.85") === -1);
+check("rules still ignore the rubric", scam.analyze(rules.OVPT_RULES, model.OVPT_SPAM_MODEL, "Reminder: Your VA clinic appointment is Tuesday at 10 a.m. Bring a photo ID.").level === "low");
+
+const localModel = require(path.join(root, "shared/local-model.js"));
+const modelInfo = localModel.catalog();
+check("webgpu size is the published file sum", modelInfo.webgpu.bytes === modelInfo.webgpu.files.reduce(function (sum, row) { return sum + row[1]; }, 0) && modelInfo.webgpu.bytes === 297975376);
+check("wasm size is the published file sum", modelInfo.wasm.bytes === modelInfo.wasm.files.reduce(function (sum, row) { return sum + row[1]; }, 0) && modelInfo.wasm.bytes === 570293367);
+check("model is not precached", modelInfo.precached === false && sw.indexOf("model_q4f16") === -1 && sw.indexOf("transformers.web.js") === -1);
+check("wasm fallback when webgpu is missing", localModel.devicePlan({ webgpu: false, wasm: true }).device === "wasm");
+check("no model without webgpu or wasm", localModel.devicePlan({ webgpu: false, wasm: false }).ok === false);
+const unconfirmed = localModel.begin({ confirmed: false });
+check("download function returns a promise", unconfirmed && typeof unconfirmed.then === "function");
+
+const tutorRetrieve = require(path.join(root, "ai-tutor/retrieve.js"));
+const foundPassages = tutorRetrieve.retrieve(tutorData, "phishing", 4);
+check("tutor retrieval cites its own source", foundPassages.length > 0 && foundPassages.every(function (item) { return item.id && item.text && sourceOk(item.source); }));
+const tutorPrompt = tutorRetrieve.tutorPrompt("What is phishing?", foundPassages);
+check("tutor prompt is limited to passages", tutorPrompt.indexOf("only from the passages") !== -1 && tutorPrompt.indexOf(foundPassages[0].id) !== -1);
+check("scram license file", fs.readFileSync(path.join(root, "scam-guardian/vendor/scram/LICENSE"), "utf8").indexOf("Erfan Mirhosseini") !== -1);
+check("debriefed manifest vendored", fs.readFileSync(path.join(root, "career-pathway-translator/vendor/debriefed/manifest.json"), "utf8").indexOf("34071") !== -1);
+check("no old pages host", !/rogerthenomad/.test(fs.readFileSync(path.join(root, "README.md"), "utf8")));
+["SECURITY.md", "CODE_OF_CONDUCT.md", "docs/agent-security-practices.md", ".github/workflows/release-zip.yml"].forEach(function (file) {
+  check("packaging file " + file, fs.existsSync(path.join(root, file)));
+});
+check("agent security citation", fs.readFileSync(path.join(root, "docs/agent-security-practices.md"), "utf8").indexOf("Pendleton, M., et al. (2026)") !== -1);
+check("runtime wasm is present and not precached", fs.existsSync(path.join(root, "shared/vendor/transformers/ort-wasm-simd-threaded.jsep.wasm")) && sw.indexOf("ort-wasm") === -1);
+
+unconfirmed.then(function (result) {
+  check("model refuses without confirmation", result && result.ok === false && result.reason === "not-confirmed");
+  if (failed) {
+    console.error(failed + " checks failed");
+    process.exit(1);
+  }
+  console.log("all checks passed");
+}).catch(function (err) {
+  console.error(err);
   process.exit(1);
-}
-console.log("all checks passed");
+});

@@ -4,6 +4,14 @@ Prepared for the Open Veteran Pathways Toolkit, an open-source project of The AI
 
 Checked on 13 November 2026 from public pages and from the files those pages link to.
 
+## Dictionary and on-device model, same day
+
+Debriefed’s `public-data/manifest.json` at commit `7d75063a4d816ab615cdfbe8868045490837f725` reports `total_rows` 34,071 under version `2026-05-20.83b39983`. The conversion in `scripts/build_career_data.py` ships 8,361 rows: the phrasing tables, MOS notes, verbs, bullet examples, quantification helpers, industry-framing examples, professional-summary examples, and keyword lists. `onet_crosswalk.json` (24,248 rows) stays out because the DMDC CSV is the military source. Funding tables, gap recommendations with costs, and cover-letter, résumé, and LinkedIn templates stay out. The free-text box uses the dictionary substitution from Debriefed’s `translation-engine.ts` (first option before a slash, case match, longest match). It does not call the Anthropic polish step in that file.
+
+Scram at commit `8610b7db4b2d6f8398b5ecbef0c4a18a0e81e1bf` is MIT, Copyright (c) 2025 Erfan Mirhosseini. The reusable text is the category enum and the prompts in `AppDetectorHelper.kt`. `GemmaLlmHelper.kt` in that tree is empty. The 0.85 and 0.15 values in `ScamDetectionModelHelper.kt` are constants in the parser, so this toolkit does not display them. The optional model is Gemma 3 270M Instruct ONNX, revision `2dbbfdb`, license field `gemma` on the Hugging Face card. File sizes were read from `https://huggingface.co/api/models/onnx-community/gemma-3-270m-it-ONNX/tree/main` on 13 November 2026: `onnx/model_q4f16.onnx` 330,717 bytes, `onnx/model_q4f16.onnx_data` 272,626,176 bytes, `onnx/model_quantized.onnx` 246,276 bytes, `onnx/model_quantized.onnx_data` 545,028,608 bytes, plus the tokenizer files listed in `shared/local-model.js`. Gemma 3n was not packaged. Scram’s README describes that model as 3.1 GB.
+
+The tutor and companion cite Pendleton, M., et al. (2026). Agent Security Framework, Version 1.0. The AI Cowboys. CC BY 4.0. https://doi.org/10.5281/zenodo.19561360. No other author is named.
+
 ## How license decisions were made
 
 The repository is MIT licensed. MIT code can sit next to other material only when that material’s own license allows redistribution and the original notice stays with it. Government works of the United States are not copyrighted under 17 U.S.C. § 105, but a file hosted on a government site can still include third-party material or a separate contract term. If a license could not be confirmed, the file was not copied.

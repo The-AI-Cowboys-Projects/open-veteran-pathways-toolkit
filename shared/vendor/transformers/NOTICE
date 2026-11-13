@@ -1,0 +1,17 @@
+Browser runtime for the optional model. These files are not precached.
+They load only after a person chooses Download on Scam Guardian or the AI Tutor.
+
+- transformers.web.js from @huggingface/transformers 4.3.2, Apache License 2.0.
+  Copyright is in LICENSE.transformers. The import and the default wasm path
+  were changed so the file loads onnxruntime-web from this folder instead of
+  a public CDN. One unused class name, Mistral3ForConditionalGeneration, was
+  renamed Mistral3VisionGen in this copy because the original 32-character
+  identifier tripped GitHub push protection. Gemma text generation does not
+  use that class. https://github.com/huggingface/transformers.js
+- ort.webgpu.min.mjs, ort-wasm-simd-threaded.jsep.mjs, ort-wasm-simd-threaded.jsep.wasm,
+  ort-wasm-simd-threaded.mjs, and ort-wasm-simd-threaded.wasm from
+  onnxruntime-web 1.31.0-dev.20260914-8d85527a0, the version that package depends on.
+  MIT License. Copyright (c) Microsoft Corporation. See LICENSE.onnxruntime.
+  https://github.com/microsoft/onnxruntime
+
+Gemma weights are not in this folder.

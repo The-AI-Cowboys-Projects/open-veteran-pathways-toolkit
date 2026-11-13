@@ -4,6 +4,13 @@
 
 ### Added
 
+- Career Pathway Translator free-text mode using 8,361 Debriefed dictionary rows. Debriefed’s manifest reports 34,071 rows; the 24,248-row crosswalk file is not shipped.
+- Scam Guardian rubric and prompts adapted from Scram, plus an optional on-device Gemma 3 270M model that is not required and is not precached.
+- Tutor passage search and the same optional model, limited to the tutor’s own sourced text. Least-agency notes for the tutor and the companion, citing Pendleton, M., et al. (2026).
+- SECURITY.md, CODE_OF_CONDUCT.md, issue and pull request templates, and an offline zip workflow.
+
+### Added earlier in this unreleased line
+
 - Shared mobile-first layout for the landing page and all four tools: 44px targets, light and dark themes, visible focus, and reduced-motion support. The wordmark appears once, in the header.
 - Empty, loading, and error states, including a labeled OCR progress bar in Scam Guardian.
 - Installable web app manifest with relative `start_url` and `scope`, brand-color icons, and an Install button where the browser supports it. iPhone and iPad instructions use Add to Home Screen.

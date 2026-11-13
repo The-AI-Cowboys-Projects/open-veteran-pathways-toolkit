@@ -10,6 +10,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import sys
 import urllib.request
 import zipfile
 from collections import defaultdict
@@ -22,6 +23,9 @@ CACHE = Path("/tmp/ovpt-career-src")
 
 DEBRIEFED_SHA = "7d75063a4d816ab615cdfbe8868045490837f725"
 DEBRIEFED_RAW = f"https://raw.githubusercontent.com/csimser/debriefed/{DEBRIEFED_SHA}"
+# public-data/manifest.json in that commit. The project describes this as 33,000+.
+DEBRIEFED_MANIFEST_VERSION = "2026-05-20.83b39983"
+DEBRIEFED_REPORTED_ROWS = 34071
 ONET_CSV = "https://www.onetcenter.org/dl_files/database/db_31_0_csv"
 MOC_ZIP = "https://www.onetcenter.org/dl_files/2019/military_crosswalk.zip"
 OOH_XLSX = "https://www.onetcenter.org/crosswalks/ooh/Occupation_Handbook_to_ONET-SOC.xlsx"
@@ -68,6 +72,255 @@ def dump_js(global_name: str, obj: object, path: Path) -> None:
 
 def blank(value: str | None) -> bool:
     return value is None or value.strip() in {"", "-"}
+
+
+def load_debriefed():
+    curated_raw = load_json(f"{DEBRIEFED_RAW}/public-data/mos_to_civilian.json", "mos_to_civilian.json")
+    phrases = []
+    for row in load_json(f"{DEBRIEFED_RAW}/public-data/phrase_translations.json", "phrase_translations.json"):
+        mil = (row.get("military_phrase") or "").strip()
+        civ = (row.get("civilian_phrase") or "").strip()
+        if mil and civ:
+            phrases.append([mil, civ, row.get("category") or ""])
+
+    evals = []
+    for row in load_json(f"{DEBRIEFED_RAW}/public-data/eval_phrases.json", "eval_phrases.json"):
+        mil = (row.get("eval_phrase") or "").strip()
+        civ = (row.get("civilian_translation") or "").strip()
+        if mil and civ:
+            evals.append([mil, civ, row.get("branch") or "", row.get("category") or ""])
+
+    jargon = []
+    for row in load_json(f"{DEBRIEFED_RAW}/public-data/military_jargon.json", "military_jargon.json"):
+        term = (row.get("military_term") or "").strip()
+        civ = (row.get("civilian_equivalent") or "").strip()
+        if term and civ:
+            jargon.append([term, civ, row.get("category") or ""])
+    jargon.sort(key=lambda item: len(item[0]), reverse=True)
+
+    acronyms = []
+    for row in load_json(f"{DEBRIEFED_RAW}/public-data/acronyms.json", "acronyms.json"):
+        short = (row.get("acronym") or "").strip()
+        full = (row.get("full_term") or "").strip()
+        plain = (row.get("civilian_explanation") or "").strip()
+        if len(short) >= 2 and full:
+            acronyms.append([short, full, plain])
+
+    ranks = []
+    for row in load_json(f"{DEBRIEFED_RAW}/public-data/rank_equivalents.json", "rank_equivalents.json"):
+        ranks.append(
+            {
+                "branch": row.get("branch") or "",
+                "paygrade": row.get("paygrade") or "",
+                "rank": row.get("military_rank") or "",
+                "civilian": row.get("civilian_equivalent") or "",
+                "level": row.get("responsibility_level") or "",
+                "team": row.get("typical_team_size") or "",
+                "gs": row.get("federal_gs_equivalent") or "",
+            }
+        )
+
+    soft = []
+    for row in load_json(f"{DEBRIEFED_RAW}/public-data/soft_skills.json", "soft_skills.json"):
+        soft.append(
+            {
+                "context": row.get("military_context") or "",
+                "skill": row.get("civilian_skill") or "",
+                "phrase": row.get("resume_phrase") or "",
+            }
+        )
+
+    verbs: dict[str, list[str]] = defaultdict(list)
+    verb_rows = []
+    for row in load_json(f"{DEBRIEFED_RAW}/public-data/action_verbs.json", "action_verbs.json"):
+        verb = (row.get("verb") or "").strip()
+        category = row.get("category") or "General"
+        strength = row.get("strength") or ""
+        if not verb:
+            continue
+        verb_rows.append([verb, category, strength])
+        if strength == "strong" and verb not in verbs[category]:
+            verbs[category].append(verb)
+
+    bullets = []
+    for row in load_json(f"{DEBRIEFED_RAW}/public-data/bullet_patterns.json", "bullet_patterns.json"):
+        example = (row.get("example_output") or "").strip()
+        if not example:
+            continue
+        name = row.get("pattern_name") or ""
+        tokens = [part for part in name.replace("-", "_").split("_") if len(part) >= 4 and not part.isdigit()]
+        bullets.append(
+            {
+                "c": row.get("category") or "",
+                "o": example,
+                "k": tokens[:8],
+            }
+        )
+
+    vague = []
+    for row in load_json(f"{DEBRIEFED_RAW}/public-data/quantification_helpers.json", "quantification_helpers.json"):
+        phrase = (row.get("vague_phrase") or "").strip()
+        alts = [item for item in (row.get("quantified_alternatives") or []) if item]
+        if phrase and alts:
+            vague.append([phrase, alts[:4], row.get("category") or ""])
+
+    framing = []
+    for row in load_json(f"{DEBRIEFED_RAW}/public-data/industry_framing.json", "industry_framing.json"):
+        text = (row.get("framed_description") or "").strip()
+        if not text:
+            continue
+        framing.append(
+            {
+                "e": row.get("military_experience") or "",
+                "i": row.get("target_industry") or "",
+                "d": text,
+                "k": [item for item in (row.get("keywords") or []) if item][:8],
+            }
+        )
+
+    summaries = []
+    for row in load_json(f"{DEBRIEFED_RAW}/public-data/professional_summaries.json", "professional_summaries.json"):
+        text = (row.get("example_output") or row.get("template_text") or "").strip()
+        if not text:
+            continue
+        summaries.append(
+            {
+                "role": row.get("target_role") or "",
+                "industry": row.get("target_industry") or "",
+                "tier": row.get("rank_tier") or "",
+                "text": text,
+            }
+        )
+
+    ats = []
+    for row in load_json(f"{DEBRIEFED_RAW}/public-data/ats_keywords.json", "ats_keywords.json"):
+        words = [item for item in (row.get("keywords") or []) if item]
+        if words:
+            ats.append(
+                {
+                    "industry": row.get("industry") or "",
+                    "role": row.get("role_type") or "",
+                    "words": words[:20],
+                }
+            )
+
+    return {
+        "curated_raw": curated_raw,
+        "phrases": phrases,
+        "evals": evals,
+        "jargon": jargon,
+        "acronyms": acronyms,
+        "ranks": ranks,
+        "soft": soft,
+        "verbs": verbs,
+        "verb_rows": verb_rows,
+        "bullets": bullets,
+        "vague": vague,
+        "framing": framing,
+        "summaries": summaries,
+        "ats": ats,
+    }
+
+
+def curated_from(curated_raw, occupations):
+    curated = []
+    missing_codes = []
+    for row in curated_raw:
+        onet_codes = []
+        for code in row.get("onet_codes") or []:
+            code = str(code).strip()
+            if not code:
+                continue
+            onet_codes.append(code)
+            if occupations is not None and code not in occupations:
+                missing_codes.append(code)
+        curated.append(
+            {
+                "branch": row.get("branch") or "",
+                "code": row.get("military_code") or "",
+                "title": row.get("military_title") or "",
+                "civilian": [t for t in (row.get("civilian_titles") or []) if t],
+                "onet": onet_codes,
+                "skills": [s for s in (row.get("key_skills") or []) if s],
+                "industries": [s for s in (row.get("industries") or []) if s],
+                "description": row.get("description") or "",
+            }
+        )
+    return curated, sorted(set(missing_codes))
+
+
+def debriefed_counts(bundle, curated):
+    shipped = {
+        "mos_to_civilian": len(curated),
+        "phrase_translations": len(bundle["phrases"]),
+        "eval_phrases": len(bundle["evals"]),
+        "military_jargon": len(bundle["jargon"]),
+        "acronyms": len(bundle["acronyms"]),
+        "rank_equivalents": len(bundle["ranks"]),
+        "soft_skills": len(bundle["soft"]),
+        "action_verbs": len(bundle["verb_rows"]),
+        "bullet_patterns": len(bundle["bullets"]),
+        "quantification_helpers": len(bundle["vague"]),
+        "industry_framing": len(bundle["framing"]),
+        "professional_summaries": len(bundle["summaries"]),
+        "ats_keywords": len(bundle["ats"]),
+    }
+    # Manifest row counts for tables this toolkit does not put in the page.
+    # onet_crosswalk is a second-hand extract; DMDC milx0724 is the military source.
+    # onet-occupations is a smaller occupation list than the O*NET 31.0 file used here.
+    not_shipped = {
+        "onet_crosswalk": 24248,
+        "onet_occupations": 427,
+        "cover_letter_templates": 351,
+        "cert_funding": 123,
+        "gap_recommendations": 86,
+        "linkedin_keywords": 447,
+        "funding_programs": 15,
+        "linkedin_templates": 10,
+        "resume_templates": 3,
+    }
+    return shipped, not_shipped
+
+
+def write_debriefed_notice() -> None:
+    license_path = fetch(f"{DEBRIEFED_RAW}/LICENSE", CACHE / "debriefed" / "LICENSE")
+    manifest_path = fetch(f"{DEBRIEFED_RAW}/public-data/manifest.json", CACHE / "debriefed" / "manifest.json")
+    VENDOR.mkdir(parents=True, exist_ok=True)
+    (VENDOR / "LICENSE").write_text(license_path.read_text(encoding="utf-8"), encoding="utf-8")
+    (VENDOR / "manifest.json").write_text(manifest_path.read_text(encoding="utf-8"), encoding="utf-8")
+    (VENDOR / "NOTICE").write_text(
+        "\n".join(
+            [
+                "Debriefed dictionary extracts",
+                "",
+                "Source: https://github.com/csimser/debriefed",
+                f"Commit: {DEBRIEFED_SHA}",
+                f"Manifest: {DEBRIEFED_MANIFEST_VERSION}",
+                f"That manifest reports total_rows {DEBRIEFED_REPORTED_ROWS}.",
+                "License: MIT. Copyright (c) 2026 Chris Simser.",
+                "See LICENSE in this folder. The MIT license applies to Chris Simser's",
+                "dictionary software and phrasing. It does not relicense U.S. government",
+                "or O*NET data that may appear alongside it.",
+                "",
+                "The page uses a conversion of the public-data JSON in that commit:",
+                "phrase translations, evaluation phrases, jargon, acronyms, MOS notes,",
+                "ranks, soft skills, action verbs, resume-bullet examples, quantification",
+                "helpers, industry-framing examples, professional-summary examples, and",
+                "keyword lists. The conversion is career-pathway-translator/data/phrases.js.",
+                "manifest.json in this folder is the upstream row manifest, unmodified.",
+                "",
+                "Not converted into the page: onet_crosswalk.json (the DMDC file is the",
+                "military source), onet-occupations.json (O*NET 31.0 is used instead),",
+                "cover-letter and resume and LinkedIn templates, funding tables, and",
+                "gap recommendations that state costs and discounts this toolkit does",
+                "not verify. Occupation facts shown next to the dictionary come from",
+                "the DMDC crosswalk and the O*NET 31.0 Database, which keep their own",
+                "terms. See THIRD_PARTY_NOTICES.md.",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
 
 
 def main() -> None:
@@ -183,134 +436,10 @@ def main() -> None:
             occupations[code]["u"] = url
     wb.close()
 
-    curated_raw = load_json(f"{DEBRIEFED_RAW}/public-data/mos_to_civilian.json", "mos_to_civilian.json")
-    curated = []
-    missing_codes = []
-    for row in curated_raw:
-        onet_codes = []
-        for code in row.get("onet_codes") or []:
-            code = str(code).strip()
-            if not code:
-                continue
-            onet_codes.append(code)
-            if code not in occupations:
-                missing_codes.append(code)
-        curated.append(
-            {
-                "branch": row.get("branch") or "",
-                "code": row.get("military_code") or "",
-                "title": row.get("military_title") or "",
-                "civilian": [t for t in (row.get("civilian_titles") or []) if t],
-                "onet": onet_codes,
-                "skills": [s for s in (row.get("key_skills") or []) if s],
-                "industries": [s for s in (row.get("industries") or []) if s],
-                "description": row.get("description") or "",
-            }
-        )
-
-    phrases = []
-    for row in load_json(f"{DEBRIEFED_RAW}/public-data/phrase_translations.json", "phrase_translations.json"):
-        mil = (row.get("military_phrase") or "").strip()
-        civ = (row.get("civilian_phrase") or "").strip()
-        if mil and civ:
-            phrases.append([mil, civ, row.get("category") or ""])
-
-    evals = []
-    for row in load_json(f"{DEBRIEFED_RAW}/public-data/eval_phrases.json", "eval_phrases.json"):
-        mil = (row.get("eval_phrase") or "").strip()
-        civ = (row.get("civilian_translation") or "").strip()
-        if mil and civ:
-            evals.append([mil, civ, row.get("branch") or "", row.get("category") or ""])
-
-    jargon = []
-    for row in load_json(f"{DEBRIEFED_RAW}/public-data/military_jargon.json", "military_jargon.json"):
-        term = (row.get("military_term") or "").strip()
-        civ = (row.get("civilian_equivalent") or "").strip()
-        if len(term) >= 4 and civ:
-            jargon.append([term, civ, row.get("category") or ""])
-    jargon.sort(key=lambda item: len(item[0]), reverse=True)
-
-    acronyms = []
-    for row in load_json(f"{DEBRIEFED_RAW}/public-data/acronyms.json", "acronyms.json"):
-        short = (row.get("acronym") or "").strip()
-        full = (row.get("full_term") or "").strip()
-        plain = (row.get("civilian_explanation") or "").strip()
-        if len(short) >= 2 and full:
-            acronyms.append([short, full, plain])
-
-    ranks = []
-    for row in load_json(f"{DEBRIEFED_RAW}/public-data/rank_equivalents.json", "rank_equivalents.json"):
-        ranks.append(
-            {
-                "branch": row.get("branch") or "",
-                "paygrade": row.get("paygrade") or "",
-                "rank": row.get("military_rank") or "",
-                "civilian": row.get("civilian_equivalent") or "",
-                "level": row.get("responsibility_level") or "",
-                "team": row.get("typical_team_size") or "",
-                "gs": row.get("federal_gs_equivalent") or "",
-            }
-        )
-
-    soft = []
-    for row in load_json(f"{DEBRIEFED_RAW}/public-data/soft_skills.json", "soft_skills.json"):
-        soft.append(
-            {
-                "context": row.get("military_context") or "",
-                "skill": row.get("civilian_skill") or "",
-                "phrase": row.get("resume_phrase") or "",
-            }
-        )
-
-    verbs: dict[str, list[str]] = defaultdict(list)
-    for row in load_json(f"{DEBRIEFED_RAW}/public-data/action_verbs.json", "action_verbs.json"):
-        if row.get("strength") != "strong":
-            continue
-        verb = (row.get("verb") or "").strip()
-        category = row.get("category") or "General"
-        if verb and verb not in verbs[category]:
-            verbs[category].append(verb)
-
-    bullets = []
-    for row in load_json(f"{DEBRIEFED_RAW}/public-data/bullet_patterns.json", "bullet_patterns.json"):
-        example = (row.get("example_output") or "").strip()
-        if not example:
-            continue
-        name = row.get("pattern_name") or ""
-        tokens = [part for part in name.replace("-", "_").split("_") if len(part) >= 4 and not part.isdigit()]
-        bullets.append(
-            {
-                "c": row.get("category") or "",
-                "o": example,
-                "k": tokens[:8],
-            }
-        )
-
-    license_path = fetch(f"{DEBRIEFED_RAW}/LICENSE", CACHE / "debriefed" / "LICENSE")
-    VENDOR.mkdir(parents=True, exist_ok=True)
-    (VENDOR / "LICENSE").write_text(license_path.read_text(encoding="utf-8"), encoding="utf-8")
-    (VENDOR / "NOTICE").write_text(
-        "\n".join(
-            [
-                "Debriefed dictionary extracts",
-                "",
-                f"Source: https://github.com/csimser/debriefed",
-                f"Commit: {DEBRIEFED_SHA}",
-                "License: MIT. Copyright (c) 2026 Chris Simser.",
-                "See LICENSE in this folder. The MIT license applies to Chris Simser's",
-                "dictionary software and phrasing. It does not relicense U.S. government",
-                "or O*NET data that may appear alongside it.",
-                "",
-                "Files derived for this toolkit (phrasing, curated MOS notes, ranks,",
-                "acronyms, resume-bullet examples, and action verbs) are transformations",
-                "of the public-data JSON in that commit. Occupation facts shown next to",
-                "them come from the DMDC crosswalk and the O*NET 31.0 Database, which",
-                "keep their own terms. See THIRD_PARTY_NOTICES.md.",
-                "",
-            ]
-        ),
-        encoding="utf-8",
-    )
+    bundle = load_debriefed()
+    curated, missing_codes = curated_from(bundle["curated_raw"], occupations)
+    write_debriefed_notice()
+    shipped, not_shipped = debriefed_counts(bundle, curated)
 
     active = sum(1 for row in rows_out if row[5] == "A")
     with_onet = sum(1 for row in rows_out if row[4])
@@ -322,19 +451,38 @@ def main() -> None:
         "mocWithOnet": with_onet,
         "occupations": len(occupations),
         "curated": len(curated),
-        "curatedOnetMissingFrom31": sorted(set(missing_codes)),
-        "phrases": len(phrases),
-        "evals": len(evals),
-        "jargon": len(jargon),
-        "acronyms": len(acronyms),
-        "ranks": len(ranks),
-        "soft": len(soft),
-        "verbCategories": len(verbs),
-        "bullets": len(bullets),
+        "curatedOnetMissingFrom31": missing_codes,
+        "phrases": len(bundle["phrases"]),
+        "evals": len(bundle["evals"]),
+        "jargon": len(bundle["jargon"]),
+        "jargonAppliedMinChars": 4,
+        "acronyms": len(bundle["acronyms"]),
+        "ranks": len(bundle["ranks"]),
+        "soft": len(bundle["soft"]),
+        "verbCategories": len(bundle["verbs"]),
+        "verbRows": len(bundle["verb_rows"]),
+        "bullets": len(bundle["bullets"]),
+        "vague": len(bundle["vague"]),
+        "framing": len(bundle["framing"]),
+        "summaries": len(bundle["summaries"]),
+        "ats": len(bundle["ats"]),
         "debriefedCommit": DEBRIEFED_SHA,
+        "debriefedManifestVersion": DEBRIEFED_MANIFEST_VERSION,
+        "debriefedReportedRows": DEBRIEFED_REPORTED_ROWS,
+        "debriefedShippedRows": sum(shipped.values()),
+        "debriefedShipped": shipped,
+        "debriefedNotShipped": not_shipped,
         "onet": "31.0",
         "oohCrosswalk": "October 2026 file from the O*NET Resource Center, maintained by BLS",
     }
+    phrases = bundle["phrases"]
+    evals = bundle["evals"]
+    jargon = bundle["jargon"]
+    acronyms = bundle["acronyms"]
+    ranks = bundle["ranks"]
+    soft = bundle["soft"]
+    verbs = bundle["verbs"]
+    bullets = bundle["bullets"]
 
     dump_js(
         "OVPT_MOC",
@@ -358,7 +506,12 @@ def main() -> None:
             "ranks": ranks,
             "soft": soft,
             "verbs": verbs,
+            "verbRows": bundle["verb_rows"],
             "bullets": bullets,
+            "vague": bundle["vague"],
+            "framing": bundle["framing"],
+            "summaries": bundle["summaries"],
+            "ats": bundle["ats"],
         },
         OUT / "phrases.js",
     )
@@ -367,5 +520,69 @@ def main() -> None:
     print(json.dumps(meta, indent=2))
 
 
+def phrases_only() -> None:
+    """Refresh the Debriefed conversion without re-downloading DMDC or O*NET."""
+    existing = json.loads((OUT / "build-stats.json").read_text(encoding="utf-8"))
+    occ_text = (OUT / "occupations.js").read_text(encoding="utf-8")
+    occ_payload = json.loads(occ_text.split("=", 1)[1].strip().rstrip(";"))
+    bundle = load_debriefed()
+    curated, missing_codes = curated_from(bundle["curated_raw"], occ_payload["occ"])
+    write_debriefed_notice()
+    shipped, not_shipped = debriefed_counts(bundle, curated)
+    meta = dict(existing)
+    meta.update(
+        {
+            "curated": len(curated),
+            "curatedOnetMissingFrom31": missing_codes,
+            "phrases": len(bundle["phrases"]),
+            "evals": len(bundle["evals"]),
+            "jargon": len(bundle["jargon"]),
+            "jargonAppliedMinChars": 4,
+            "acronyms": len(bundle["acronyms"]),
+            "ranks": len(bundle["ranks"]),
+            "soft": len(bundle["soft"]),
+            "verbCategories": len(bundle["verbs"]),
+            "verbRows": len(bundle["verb_rows"]),
+            "bullets": len(bundle["bullets"]),
+            "vague": len(bundle["vague"]),
+            "framing": len(bundle["framing"]),
+            "summaries": len(bundle["summaries"]),
+            "ats": len(bundle["ats"]),
+            "debriefedCommit": DEBRIEFED_SHA,
+            "debriefedManifestVersion": DEBRIEFED_MANIFEST_VERSION,
+            "debriefedReportedRows": DEBRIEFED_REPORTED_ROWS,
+            "debriefedShippedRows": sum(shipped.values()),
+            "debriefedShipped": shipped,
+            "debriefedNotShipped": not_shipped,
+        }
+    )
+    dump_js(
+        "OVPT_PHRASES",
+        {
+            "curated": curated,
+            "phrases": bundle["phrases"],
+            "evals": bundle["evals"],
+            "jargon": bundle["jargon"],
+            "acronyms": bundle["acronyms"],
+            "ranks": bundle["ranks"],
+            "soft": bundle["soft"],
+            "verbs": bundle["verbs"],
+            "verbRows": bundle["verb_rows"],
+            "bullets": bundle["bullets"],
+            "vague": bundle["vague"],
+            "framing": bundle["framing"],
+            "summaries": bundle["summaries"],
+            "ats": bundle["ats"],
+        },
+        OUT / "phrases.js",
+    )
+    dump_js("OVPT_META", meta, OUT / "meta.js")
+    (OUT / "build-stats.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({k: meta[k] for k in ("debriefedShippedRows", "debriefedReportedRows", "debriefedShipped", "jargon")}, indent=2))
+
+
 if __name__ == "__main__":
-    main()
+    if "--phrases-only" in sys.argv:
+        phrases_only()
+    else:
+        main()

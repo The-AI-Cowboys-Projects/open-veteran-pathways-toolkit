@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Pathways">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://huggingface.co https://cdn-lfs.huggingface.co https://cas-bridge.xethub.hf.co; worker-src 'self' blob:; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
   <title>Plain-English AI Tutor</title>
   <link rel="icon" href="../icons/favicon-32.png" type="image/png">
   <link rel="apple-touch-icon" href="../icons/icon-180.png">
@@ -66,6 +66,26 @@
       </div>
     </section>
     <div id="reader" aria-live="polite"></div>
+    <section class="panel" id="oversight">
+      <h2>A person stays in charge</h2>
+      <p>These lessons do not act for you. Marking a lesson read, scoring a quiz, or asking a question only updates this page. Nothing is filed, sent, or decided. Progress stays in this browser under the key <code>ovpt-tutor-progress</code> until you clear it or download the JSON backup.</p>
+      <p>The optional question box searches this tutor’s own lessons first. A model, if you download one, may phrase an answer only from those passages and must show the citation. That wording is a suggestion for you to review. It is not advice, and the page will not take the next step.</p>
+      <p>This follows the least-agency defaults in Pendleton, M., et al. (2026). Agent Security Framework, Version 1.0. The AI Cowboys. CC BY 4.0. <a href="https://doi.org/10.5281/zenodo.19561360" rel="noopener noreferrer">https://doi.org/10.5281/zenodo.19561360</a>. A short note on how that is applied here is in <a href="../docs/agent-security-practices.md">docs/agent-security-practices.md</a>.</p>
+    </section>
+    <section class="panel">
+      <h2>Ask from the lessons</h2>
+      <form id="ask-form">
+        <label for="ask">Question</label>
+        <input id="ask" type="text" autocomplete="off" placeholder="Example: what is phishing?">
+        <button type="submit">Find sourced passages</button>
+      </form>
+      <div id="ask-output" aria-live="polite">
+        <p class="state state-empty" id="ask-empty">Passages from this tutor appear here. The search does not use a network.</p>
+      </div>
+      <p><button type="button" id="ask-model">Ask the on-device model</button></p>
+      <div id="model-answer" aria-live="polite"></div>
+    </section>
+    <section class="panel" id="model-panel"></section>
     <section class="panel">
       <h2>Where the words come from</h2>
       <p id="tutor-counts">Counts appear when the lesson file loads.</p>
@@ -80,6 +100,8 @@
   </footer>
   <script src="../shared/shell.js"></script>
   <script src="data/content.js"></script>
+  <script src="retrieve.js"></script>
+  <script src="../shared/local-model.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
