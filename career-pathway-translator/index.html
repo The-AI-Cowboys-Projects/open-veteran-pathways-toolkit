@@ -1,107 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Career Pathway Translator — Open Veteran Pathways Toolkit</title>
-  <style>
-    :root { --navy: #0A0A0E; --teal: #12A594; --magenta: #DD368A; --paper: #F7F5F0; }
-    body { font-family: system-ui, -apple-system, sans-serif; margin: 0; background: var(--paper); color: var(--navy); line-height: 1.5; }
-    .wrap { max-width: 720px; margin: 0 auto; padding: 2rem 1.25rem; }
-    h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
-    .sub { color: #444; margin-bottom: 1.5rem; }
-    label { display: block; font-weight: 600; margin-bottom: 0.35rem; }
-    input, textarea, button { font: inherit; width: 100%; box-sizing: border-box; }
-    input, textarea { padding: 0.65rem 0.75rem; border: 1px solid #ccc; border-radius: 6px; }
-    button { margin-top: 0.75rem; background: var(--magenta); color: white; border: none; padding: 0.75rem; border-radius: 6px; font-weight: 600; cursor: pointer; }
-    button:hover { background: #c02d78; }
-    .result { margin-top: 1.5rem; background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem; }
-    .path { margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #eee; }
-    .path:last-child { border-bottom: none; }
-    .badge { display: inline-block; font-size: 0.75rem; background: var(--teal); color: white; padding: 0.15rem 0.4rem; border-radius: 4px; margin-left: 0.5rem; }
-    footer { margin-top: 2rem; font-size: 0.8rem; color: #666; }
-    a { color: var(--teal); }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+  <title>Career Pathway Translator</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="wrap">
-    <h1>Career Pathway Translator</h1>
-    <p class="sub">Offline military-to-civilian pathways. Enter your MOS, AFSC, or Rating. No account. Data stays on your device.</p>
-
-    <form id="form">
-      <label for="code">MOS / AFSC / Rating</label>
-      <input id="code" name="code" placeholder="e.g. 11B, 68W, HM, 2A5X1" required autocomplete="off">
-      <button type="submit">Translate</button>
-    </form>
-
-    <div id="output"></div>
-
-    <footer>
-      Open Veteran Pathways Toolkit · The AI Cowboys Foundation<br>
-      MIT License · Offline-first · Private by default<br>
-      <a href="https://theaicowboysfoundation.org/learn/mos-to-ceo">Full MOS to CEO Translator on the Foundation site</a>
-    </footer>
-  </div>
-
-  <script>
-    // Sample Foundation-aligned pathways (expandable). Full 33k+ Debriefed-style dictionary can be loaded later.
-    const PATHWAYS = {
-      "11B": {
-        title: "Infantryman",
-        paths: [
-          { role: "Security Consulting", bullets: ["Led small-unit tactics and risk assessment under pressure", "Trained teams on operational security and force protection", "Managed logistics and accountability for equipment and personnel"] },
-          { role: "Project Coordination", bullets: ["Coordinated multi-person operations with clear timelines and contingencies", "Translated complex orders into executable team actions", "Documented after-action reviews and process improvements"] },
-          { role: "Field Operations Management", bullets: ["Supervised teams in dynamic environments", "Maintained readiness standards and equipment accountability", "Communicated status to higher command clearly and accurately"] }
-        ]
-      },
-      "68W": {
-        title: "Combat Medic",
-        paths: [
-          { role: "Mobile Urgent Care / EMS", bullets: ["Provided emergency medical care in austere environments", "Triaged patients and stabilized for higher-level care", "Maintained detailed medical documentation under time pressure"] },
-          { role: "Clinical Coordination", bullets: ["Coordinated care across providers and facilities", "Educated patients and families on treatment plans", "Managed medical supplies and inventory accountability"] },
-          { role: "Healthcare Training", bullets: ["Trained non-medical personnel in basic lifesaving skills", "Developed and delivered medical readiness instruction", "Evaluated trainee performance and documented certifications"] }
-        ]
-      },
-      "HM": {
-        title: "Hospital Corpsman",
-        paths: [
-          { role: "Medical Staffing / Clinic Support", bullets: ["Delivered patient care in clinical and operational settings", "Managed medical records and privacy requirements", "Supported providers with accurate patient preparation and follow-up"] },
-          { role: "Healthcare Administration", bullets: ["Tracked patient flow and resource utilization", "Ensured compliance with medical standards and regulations", "Coordinated between clinical teams and support staff"] },
-          { role: "Community Health Outreach", bullets: ["Educated populations on preventive care", "Organized medical readiness events", "Documented health metrics for unit reporting"] }
-        ]
-      }
-    };
-
-    const form = document.getElementById('form');
-    const output = document.getElementById('output');
-    const codeInput = document.getElementById('code');
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const code = codeInput.value.trim().toUpperCase();
-      const data = PATHWAYS[code];
-
-      if (!data) {
-        output.innerHTML = `<div class="result"><p>No exact match for <strong>${code}</strong> in this offline sample. Try 11B, 68W, or HM, or use the full <a href="https://theaicowboysfoundation.org/learn/mos-to-ceo">MOS to CEO Translator</a> on the Foundation site.</p></div>`;
-        return;
-      }
-
-      let html = `<div class="result"><h2>${data.title} <span class="badge">${code}</span></h2>`;
-      data.paths.forEach((p, i) => {
-        html += `<div class="path"><h3>${i + 1}. ${p.role}</h3><ul>`;
-        p.bullets.forEach(b => { html += `<li>${b}</li>`; });
-        html += `</ul></div>`;
-      });
-      html += `<p style="margin-top:1rem;font-size:0.9rem;">Next steps: Review the full <a href="https://theaicowboysfoundation.org/learn/ai-guide">AI Guide</a> and <a href="https://theaicowboysfoundation.org/learn/open-veteran-pathways">Open Veteran Pathways Toolkit</a>.</p></div>`;
-      output.innerHTML = html;
-
-      // Optional localStorage for user history (private by default)
-      try {
-        const history = JSON.parse(localStorage.getItem('pathway-history') || '[]');
-        history.unshift({ code, title: data.title, ts: Date.now() });
-        localStorage.setItem('pathway-history', JSON.stringify(history.slice(0, 10)));
-      } catch (e) {}
-    });
-  </script>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="brand-bar"></div>
+    <div class="header-inner">
+      <div>
+        <p>Open Veteran Pathways Toolkit</p>
+        <h1>Career Pathway Translator</h1>
+        <p>Look up a code or duty description on this device. Nothing is uploaded.</p>
+      </div>
+      <button type="button" class="ghost" id="text-size" aria-pressed="false">Larger text</button>
+    </div>
+  </header>
+  <nav class="wrap tool-nav" aria-label="Toolkit">
+    <a href="../index.html" aria-current="page">Home</a>
+    <a href="../scam-guardian/index.html">Scam Guardian</a>
+    <a href="../ai-tutor/index.html">AI Tutor</a>
+    <a href="../transition-companion/index.html">Transition Companion</a>
+  </nav>
+  <main id="main" class="wrap">
+    <section class="panel">
+      <p>Enter an Army MOS, Marine Corps MOS, Air Force or Space Force AFSC, Navy rating or designator, or Coast Guard rating. You can also type a title such as “combat medic” or paste unclassified duty wording.</p>
+      <form id="search-form">
+        <label for="code">Code or title</label>
+        <input id="code" name="code" type="text" autocomplete="off" placeholder="Examples: 11B, 68W, HM, 0311, 2A5X1">
+        <label for="branch">Branch</label>
+        <select id="branch" name="branch">
+          <option value="all">All branches</option>
+          <option value="army">Army</option>
+          <option value="navy">Navy</option>
+          <option value="usaf">Air Force</option>
+          <option value="usmc">Marine Corps</option>
+          <option value="uscg">Coast Guard</option>
+          <option value="ussf">Space Force</option>
+        </select>
+        <label for="duty">Duty description to reword (optional, keep it unclassified)</label>
+        <textarea id="duty" name="duty" placeholder="Example: Briefed flag officers and supervised personnel."></textarea>
+        <label class="check" for="obsolete"><input id="obsolete" type="checkbox"> Include obsolete codes</label>
+        <button type="submit">Look up</button>
+      </form>
+    </section>
+    <div id="output" aria-live="polite"></div>
+    <section class="panel">
+      <h2>Pay grade wording</h2>
+      <p>A separate Debriefed table suggests civilian scope language for pay grades. It does not convert a rank into a civilian job title.</p>
+      <form id="rank-form">
+        <div class="row">
+          <div>
+            <label for="rank-branch">Branch</label>
+            <select id="rank-branch"></select>
+          </div>
+          <div>
+            <label for="rank-grade">Pay grade</label>
+            <select id="rank-grade"><option value="">Choose a branch first</option></select>
+          </div>
+        </div>
+        <button type="submit" class="secondary">Show rank wording</button>
+      </form>
+      <div id="rank-output"></div>
+    </section>
+    <section class="panel">
+      <h2>What this file contains</h2>
+      <p id="about-counts"></p>
+      <p>Military codes and O*NET-SOC links are from the Defense Manpower Data Center crosswalk distributed by the O*NET Resource Center. Occupation descriptions, skills, sample titles, and job-zone text are from the O*NET 31.0 Database by the U.S. Department of Labor, Employment and Training Administration, used under CC BY 4.0. This toolkit shortened the database to those fields and dropped rows that were not needed for this lookup. USDOL/ETA has not approved, endorsed, or tested these modifications. O*NET® is a trademark of USDOL/ETA.</p>
+      <p>Handbook links are from the BLS Occupational Outlook Handbook crosswalk. Resume phrases, curated civilian titles, jargon, acronyms, and rank wording are from Debriefed by Chris Simser, MIT License, commit 7d75063a4d816ab615cdfbe8868045490837f725.</p>
+      <p>Some official links point at military O*NET occupations, especially infantry codes in group 55. Those records describe the service job. Dictionary titles beside them are suggestions for a human to review. Additional skill identifiers, prefixes, Navy AQDs, and similar add-on codes are not in this offline file. Primary enlisted, warrant, and officer codes for the six branches are.</p>
+      <p><button type="button" class="secondary" id="clear-history">Clear code history on this browser</button></p>
+      <p id="history"></p>
+    </section>
+  </main>
+  <footer>
+    <div class="wrap">
+      <p>The AI Cowboys Foundation is a Texas 501(c)(3) in San Antonio. This tool is not affiliated with, endorsed by, or part of the Department of Defense, the Department of Veterans Affairs, or any other government agency. Outputs are for human review. They are not legal, medical, financial, benefits, or employment advice. Never enter classified information, Controlled Unclassified Information (CUI), protected health information, Social Security numbers, or other sensitive personal information. Everything on this page runs in your browser. The page does not send your text to a server.</p>
+    </div>
+  </footer>
+  <script src="data/meta.js"></script>
+  <script src="data/moc.js"></script>
+  <script src="data/occupations.js"></script>
+  <script src="data/phrases.js"></script>
+  <script src="engine.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

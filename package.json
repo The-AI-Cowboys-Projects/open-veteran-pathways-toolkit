@@ -1,0 +1,12 @@
+{
+  "name": "open-veteran-pathways-toolkit",
+  "private": true,
+  "description": "Offline tools for veterans, military families, and older adults.",
+  "scripts": {
+    "verify": "node scripts/verify.mjs",
+    "build:career": "python3 scripts/build_career_data.py",
+    "build:scam-model": "python3 scripts/build_scam_model.py",
+    "vendor:tesseract": "bash scripts/vendor_tesseract.sh"
+  },
+  "license": "MIT"
+}

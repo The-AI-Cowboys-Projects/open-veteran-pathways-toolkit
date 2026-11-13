@@ -1,0 +1,24 @@
+Offline OCR files for Scam Guardian.
+
+tesseract.js 7.0.0
+  https://github.com/naptha/tesseract.js
+  Apache License 2.0. Copyright notices for bundled MIT/BSD pieces are in
+  tesseract.min.js.LICENSE.txt and worker.min.js.LICENSE.txt
+  (regenerator-runtime MIT, buffer MIT, ieee754 BSD-3-Clause, zlib.js MIT).
+
+tesseract.js-core 7.0.0
+  https://github.com/naptha/tesseract.js-core
+  Apache License 2.0. LSTM-only builds are included:
+  tesseract-core-lstm.wasm.js, tesseract-core-simd-lstm.wasm.js,
+  and tesseract-core-relaxedsimd-lstm.wasm.js.
+  The core bundles Tesseract OCR and its libraries (Leptonica, libjpeg,
+  libpng, libtiff, giflib, zlib, and others). See LICENSE.tesseract.js-core.
+
+English traineddata
+  @tesseract.js-data/eng 1.0.0 file 4.0.0_best_int/eng.traineddata.gz
+  The npm package declares MIT. The underlying tessdata project
+  (https://github.com/tesseract-ocr/tessdata, integerized best models)
+  is Apache License 2.0. Both notices are kept.
+
+These files are used only in the browser on this device. The page does not
+call a cloud OCR service.

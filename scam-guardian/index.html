@@ -1,115 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>On-Device Scam & Deepfake Guardian — Open Veteran Pathways Toolkit</title>
-  <style>
-    :root { --navy: #0A0A0E; --teal: #12A594; --magenta: #DD368A; --paper: #F7F5F0; }
-    body { font-family: system-ui, -apple-system, sans-serif; margin: 0; background: var(--paper); color: var(--navy); line-height: 1.5; }
-    .wrap { max-width: 720px; margin: 0 auto; padding: 2rem 1.25rem; }
-    h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
-    .sub { color: #444; margin-bottom: 1.5rem; }
-    label { display: block; font-weight: 600; margin-bottom: 0.35rem; }
-    textarea, button { font: inherit; width: 100%; box-sizing: border-box; }
-    textarea { padding: 0.65rem 0.75rem; border: 1px solid #ccc; border-radius: 6px; min-height: 120px; }
-    button { margin-top: 0.75rem; background: var(--magenta); color: white; border: none; padding: 0.75rem; border-radius: 6px; font-weight: 600; cursor: pointer; }
-    button:hover { background: #c02d78; }
-    .result { margin-top: 1.5rem; background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem; }
-    .risk-high { border-left: 4px solid #c0392b; }
-    .risk-med { border-left: 4px solid #e67e22; }
-    .risk-low { border-left: 4px solid var(--teal); }
-    .badge { display: inline-block; font-size: 0.75rem; padding: 0.15rem 0.4rem; border-radius: 4px; color: white; }
-    .badge.high { background: #c0392b; }
-    .badge.med { background: #e67e22; }
-    .badge.low { background: var(--teal); }
-    ul { margin: 0.5rem 0; padding-left: 1.2rem; }
-    footer { margin-top: 2rem; font-size: 0.8rem; color: #666; }
-    a { color: var(--teal); }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+  <title>Scam Guardian</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="wrap">
-    <h1>On-Device Scam & Deepfake Guardian</h1>
-    <p class="sub">Privacy-first local analysis for veteran- and elder-targeted scams. Paste text from a message, email, or screenshot description. Nothing leaves your device.</p>
-
-    <form id="form">
-      <label for="text">Paste message, email, or description of image/screenshot</label>
-      <textarea id="text" placeholder="Example: 'This is the VA. Your benefits are suspended. Call this number immediately and confirm your Social Security number...'" required></textarea>
-      <button type="submit">Analyze locally</button>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="brand-bar"></div>
+    <div class="header-inner">
+      <div>
+        <p>Open Veteran Pathways Toolkit</p>
+        <h1>Scam Guardian</h1>
+        <p>Check a message or a screenshot on this device. This page does not detect deepfakes, voice clones, or faces.</p>
+      </div>
+      <button type="button" class="ghost" id="text-size" aria-pressed="false">Larger text</button>
+    </div>
+  </header>
+  <nav class="wrap tool-nav" aria-label="Toolkit">
+    <a href="../index.html">Home</a>
+    <a href="../career-pathway-translator/index.html">Careers</a>
+    <a href="../ai-tutor/index.html">AI Tutor</a>
+    <a href="../transition-companion/index.html">Transition Companion</a>
+  </nav>
+  <main id="main" class="wrap">
+    <section class="warning">
+      <p>This is an aid, not a guarantee. It explains which written rules matched. It cannot prove a message is safe, and it cannot tell you what VA, a bank, or a court will do. If you already sent money or personal information, contact the organization using a number you look up yourself, then consider <a href="https://reportfraud.ftc.gov/" rel="noopener noreferrer">ReportFraud.ftc.gov</a> and <a href="https://www.ic3.gov/" rel="noopener noreferrer">IC3.gov</a>.</p>
+    </section>
+    <form id="form" class="panel">
+      <label for="text">Paste the message, email, or letter</label>
+      <textarea id="text" required placeholder="Paste the wording here. Do not include your Social Security number, passwords, or medical details."></textarea>
+      <label for="image">Or add a screenshot (read on this device)</label>
+      <input id="image" type="file" accept="image/*">
+      <p id="ocr-status">Screenshot reading uses local Tesseract files in this folder. It needs a normal web address (a local server or GitHub Pages), not a double-clicked file, because browsers block the OCR worker from file://.</p>
+      <button type="submit">Analyze on this device</button>
     </form>
-
-    <div id="output"></div>
-
-    <footer>
-      Open Veteran Pathways Toolkit · The AI Cowboys Foundation<br>
-      MIT License · On-device / local only · Private by default<br>
-      Inspired by open on-device approaches (e.g. Gemma 3n / Scram). Full multimodal model can be added later.<br>
-      <a href="https://theaicowboysfoundation.org/learn/veteran-scam-protection">Scam protection guidance on the Foundation site</a>
-    </footer>
-  </div>
-
-  <script>
-    // Local pattern matching specialized for veteran/elder scams. No network calls.
-    const PATTERNS = [
-      { re: /va\s*benefits?|veterans?\s*affairs|disability\s*claim/i, tag: "VA benefits claim", weight: 2 },
-      { re: /social\s*security|ssn|account\s*number/i, tag: "Personal ID request", weight: 3 },
-      { re: /suspended|frozen|locked|immediate\s*action|call\s*now|urgent/i, tag: "Urgency / account lock", weight: 2 },
-      { re: /military\s*impersonat|army\s*recruiter|navy\s*personnel|air\s*force\s*command/i, tag: "Military impersonation", weight: 3 },
-      { re: /gift\s*card|wire\s*transfer|crypto|bitcoin|payment\s*now/i, tag: "Payment demand", weight: 3 },
-      { re: /deepfake|fake\s*video|ai\s*voice|synthetic/i, tag: "Possible deepfake mention", weight: 2 },
-      { re: /inheritance|lottery|prize|you\s*have\s*won/i, tag: "Prize / inheritance scam", weight: 2 },
-      { re: /verify\s*your|confirm\s*your|update\s*your\s*information/i, tag: "Verification request", weight: 1 }
-    ];
-
-    function analyze(text) {
-      const hits = [];
-      let score = 0;
-      PATTERNS.forEach(p => {
-        if (p.re.test(text)) {
-          hits.push(p.tag);
-          score += p.weight;
-        }
-      });
-
-      let level = "low";
-      let summary = "No strong veteran/elder scam indicators detected in this text.";
-      if (score >= 6) {
-        level = "high";
-        summary = "High risk. Multiple classic veteran/elder scam patterns detected. Do not call, click, or share information. Verify directly with official VA or service channels.";
-      } else if (score >= 3) {
-        level = "med";
-        summary = "Medium risk. Some suspicious patterns. Treat as untrusted until verified through official sources.";
-      }
-
-      return { level, summary, hits, score };
-    }
-
-    const form = document.getElementById('form');
-    const output = document.getElementById('output');
-    const textArea = document.getElementById('text');
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const text = textArea.value.trim();
-      if (!text) return;
-
-      const result = analyze(text);
-      const cls = result.level === 'high' ? 'risk-high' : result.level === 'med' ? 'risk-med' : 'risk-low';
-      const badgeCls = result.level;
-
-      let html = `<div class="result ${cls}">`;
-      html += `<p><span class="badge ${badgeCls}">${result.level.toUpperCase()} RISK</span></p>`;
-      html += `<p>${result.summary}</p>`;
-      if (result.hits.length) {
-        html += `<p><strong>Indicators found:</strong></p><ul>`;
-        result.hits.forEach(h => { html += `<li>${h}</li>`; });
-        html += `</ul>`;
-      }
-      html += `<p style="font-size:0.9rem;margin-top:1rem;">This is local pattern analysis only. For full on-device vision (screenshots), a Gemma 3n-style model can be integrated later. Always verify with official sources.</p>`;
-      html += `</div>`;
-      output.innerHTML = html;
-    });
-  </script>
+    <div id="output" aria-live="polite"></div>
+    <section class="panel">
+      <h2>How the rules were chosen</h2>
+      <p>The rules are original to this toolkit. They look for tactics described in public VA, VA OIG, FTC, and FBI IC3 material: benefits impersonation, pension poaching, claim fees, gift cards and wires, romance or emergency money requests, lookalike links, prize lures, and remote-access support. Each hit shows the phrase that matched and a link to a public page. The page does not download those sites when you analyze a message.</p>
+      <p>A second, optional hint comes from a small naive Bayes model trained on the SMS Spam Collection v.1 (Almeida, Gómez Hidalgo, and Yamakami, 2011). The raw text messages are not included. At a 90% cutoff, one 20% holdout of that collection had about 88% precision and 99% recall. That is promotional text-message spam from around 2011, so the hint is weak on veteran-benefits fraud. The rule score does not change because of the model.</p>
+      <p>The offline screenshot idea follows the approach in Scram by Erfan Mirhosseini (MIT), which runs Gemma on an Android phone. This page does not include Scram’s code or Google’s Gemma model. Gemma’s terms are not the MIT license, and the model is multi-gigabyte. OCR here is Tesseract.js 7 and tesseract.js-core 7, Apache-2.0, with English traineddata stored in <code>vendor/tesseract/</code>.</p>
+    </section>
+  </main>
+  <footer>
+    <div class="wrap">
+      <p>The AI Cowboys Foundation is a Texas 501(c)(3) in San Antonio. This tool is not affiliated with, endorsed by, or part of the Department of Defense, the Department of Veterans Affairs, or any other government agency. Outputs are for human review. They are not legal, medical, financial, benefits, or employment advice. Never enter classified information, Controlled Unclassified Information (CUI), protected health information, Social Security numbers, or other sensitive personal information. Everything on this page runs in your browser. The page does not send your text or screenshot to a server.</p>
+    </div>
+  </footer>
+  <script src="vendor/tesseract/tesseract.min.js"></script>
+  <script src="data/rules.js"></script>
+  <script src="data/model.js"></script>
+  <script src="engine.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
