@@ -4,18 +4,25 @@
   const model = window.OVPT_SPAM_MODEL;
   const output = document.getElementById("output");
   const status = document.getElementById("ocr-status");
+  const progress = document.getElementById("ocr-progress");
+  const bar = document.getElementById("ocr-bar");
+  const ocrError = document.getElementById("ocr-error");
   const textBtn = document.getElementById("text-size");
+  const imageInput = document.getElementById("image");
+  let ocrBusy = false;
 
-  function applyTextSize() {
-    const on = localStorage.getItem("ovpt-large-text") === "1";
-    document.documentElement.classList.toggle("large-text", on);
-    textBtn.setAttribute("aria-pressed", on ? "true" : "false");
-  }
-  textBtn.addEventListener("click", function () {
-    localStorage.setItem("ovpt-large-text", localStorage.getItem("ovpt-large-text") === "1" ? "0" : "1");
+  if (textBtn && textBtn.getAttribute("data-bound") !== "shell") {
+    function applyTextSize() {
+      const on = localStorage.getItem("ovpt-large-text") === "1";
+      document.documentElement.classList.toggle("large-text", on);
+      textBtn.setAttribute("aria-pressed", on ? "true" : "false");
+    }
+    textBtn.addEventListener("click", function () {
+      localStorage.setItem("ovpt-large-text", localStorage.getItem("ovpt-large-text") === "1" ? "0" : "1");
+      applyTextSize();
+    });
     applyTextSize();
-  });
-  applyTextSize();
+  }
 
   function h(tag, attrs, children) {
     const node = document.createElement(tag);
@@ -30,12 +37,23 @@
     return node;
   }
 
+  function showOcrError(message) {
+    ocrBusy = false;
+    if (imageInput) imageInput.disabled = false;
+    if (progress) progress.hidden = true;
+    status.className = "state state-empty";
+    status.textContent = "Screenshot reading stopped before it finished.";
+    if (!ocrError) return;
+    ocrError.hidden = false;
+    ocrError.textContent = message;
+  }
+
   function render(result) {
     output.replaceChildren();
     const heading = h("h2", { id: "results-heading", tabindex: "-1", text: "Result" });
     output.append(heading);
     if (!result.ok) {
-      output.append(h("p", { text: "Paste a little more of the message. A few words are not enough to judge." }));
+      output.append(h("p", { class: "state state-empty", text: "Paste a little more of the message. A few words are not enough to judge." }));
       heading.focus();
       return;
     }
@@ -46,7 +64,7 @@
     banner.append(h("p", { text: "Rule score " + result.score + ". This is an aid, not a guarantee. A careful scam can score low, and a clumsy real message can score higher." }));
     output.append(banner);
     if (!result.hits.length) {
-      output.append(h("p", { text: "None of the typed rules matched." }));
+      output.append(h("p", { class: "state state-empty", text: "None of the typed rules matched. That is not a clearance." }));
     }
     result.hits.forEach(function (hit) {
       const box = h("article", { class: "hit" });
@@ -81,15 +99,39 @@
     heading.focus();
   }
 
+  if (!engine || !rules || !model) {
+    output.replaceChildren();
+    const err = h("p", {
+      class: "state state-error",
+      role: "alert",
+      text: "The scam rules or the SMS model did not load. Reload once while online. After that, the saved copy can open offline.",
+    });
+    output.append(err);
+    return;
+  }
+
   document.getElementById("form").addEventListener("submit", function (event) {
     event.preventDefault();
     render(engine.analyze(rules, model, document.getElementById("text").value));
   });
 
-  document.getElementById("image").addEventListener("change", function (event) {
+  imageInput.addEventListener("change", function (event) {
     const file = event.target.files && event.target.files[0];
-    if (!file) return;
+    if (!file || ocrBusy) return;
+    if (!window.Tesseract || !window.Tesseract.createWorker) {
+      showOcrError("Local OCR did not load. Paste the text instead. Analysis of pasted text still works.");
+      return;
+    }
+    ocrBusy = true;
+    imageInput.disabled = true;
+    if (ocrError) ocrError.hidden = true;
+    status.className = "state state-loading";
     status.textContent = "Reading the image on this device. The first run loads the local OCR files and can take a little while.";
+    if (progress) progress.hidden = false;
+    if (bar) {
+      bar.style.width = "0%";
+      bar.setAttribute("aria-valuenow", "0");
+    }
     const base = new URL("vendor/tesseract/", window.location.href);
     window.Tesseract.createWorker("eng", 1, {
       workerPath: new URL("worker.min.js", base).href,
@@ -99,21 +141,31 @@
       gzip: true,
       logger: function (message) {
         if (!message || !message.status) return;
-        const pct = typeof message.progress === "number" ? " " + Math.round(message.progress * 100) + "%" : "";
-        status.textContent = message.status + pct;
+        const fraction = typeof message.progress === "number" ? message.progress : null;
+        const pct = fraction === null ? "" : " " + Math.round(fraction * 100) + "%";
+        status.textContent = "Reading the screenshot on this device: " + message.status + pct;
+        if (bar && fraction !== null) {
+          const n = Math.max(0, Math.min(100, Math.round(fraction * 100)));
+          bar.style.width = n + "%";
+          bar.setAttribute("aria-valuenow", String(n));
+        }
       },
     }).then(function (worker) {
       return worker.recognize(file).then(function (result) {
         return worker.terminate().then(function () { return result; });
       });
     }).then(function (result) {
+      ocrBusy = false;
+      imageInput.disabled = false;
+      if (progress) progress.hidden = true;
       const text = (result && result.data && result.data.text) || "";
       document.getElementById("text").value = text.trim();
+      status.className = "state state-empty";
       status.textContent = text.trim()
         ? "Text from the image is in the box. Fix OCR mistakes, then analyze. The image was not uploaded."
-        : "OCR finished without readable text. Try a clearer crop or type the message.";
+        : "OCR finished without readable text. Try a clearer crop, or type the message.";
     }).catch(function () {
-      status.textContent = "Local OCR did not start. Opening the file directly (file://) often blocks the OCR worker. Serve this folder with a local web server, or paste the text instead. Analysis of pasted text still works with no server.";
+      showOcrError("Local OCR did not start. Opening the file directly (file://) often blocks the OCR worker. Serve this folder with a local web server, or paste the text instead. Analysis of pasted text still works with no server.");
     });
   });
 })();

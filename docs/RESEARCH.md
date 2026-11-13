@@ -121,9 +121,15 @@ Patterns covered: benefits impersonation, threats to suspend benefits, requests 
 
 ## Plain-English AI Tutor
 
-No third-party course text was copied. The 36 glossary entries, 6 lessons, and 19 quiz questions were written for this repository. They explain public ideas (models, prompts, hallucinations, phishing, deepfakes) in original sentences. They are not a certified curriculum and not the Foundation’s older website copy, because that website text was not in this repo and was not scraped.
+No third-party course text was copied. The glossary, lessons, and quiz questions were written for this repository. They explain public ideas in original sentences. They are not a certified curriculum and not the Foundation’s older website copy, because that website text was not in this repo and was not scraped.
 
-A search for an open veteran-transition textbook with a license compatible with MIT did not turn up a glossary that was both on point and clearly reusable. Writing the lessons avoided that problem.
+The current lesson file has 12 lessons, 95 glossary entries, and 64 quiz questions. Each entry and each quiz explanation stores a link to a public source the sentence relies on: NIST AI RMF 1.0 and the Generative AI Profile (AI 600-1), the NIST Privacy Framework, FTC and ReportFraud pages, VA fraud and accreditation pages, CISA’s deepfake alert and phishing guidance, the FBI IC3 generative-AI advisory, EEOC’s AI explainer, O*NET and CareerOneStop pages, Department of Labor VETS and TAP pages, and papers or textbooks including Vaswani et al. (2017), Brown et al. (2020), Bender et al., Ji et al., Weidinger et al., Jurafsky and Martin, and Almeida et al. (2011). Counts and host names are checked by `scripts/verify.mjs`. The lesson text does not invent percentages, dollar losses, or detector accuracy. Where a page states a changing statistic, the lesson describes the tactic and links the page instead of repeating the number.
+
+A search for an open veteran-transition textbook with a license compatible with MIT did not turn up a glossary that was both on point and clearly reusable. Writing the lessons avoided that problem. The synthetic-media lesson is educational. It states that Scam Guardian does not detect deepfakes and it does not explain how to build one.
+
+## Installable copy
+
+The manifest and service worker were added so the same static files can be installed from GitHub Pages or from another folder. `start_url` and `scope` are relative. The precache list is the files the tools already load, including the DMDC and O*NET JavaScript files, the naive Bayes model, and the vendored Tesseract worker, LSTM cores, and English traineddata. No new third-party dataset was added for the offline cache. Icons are generated brand-color rectangles, not a new logo and not a copied mark.
 
 ## Transition Companion
 

@@ -8,18 +8,31 @@
   const form = document.getElementById("search-form");
   const textBtn = document.getElementById("text-size");
 
-  function applyTextSize() {
-    const on = localStorage.getItem("ovpt-large-text") === "1";
-    document.documentElement.classList.toggle("large-text", on);
-    if (textBtn) textBtn.setAttribute("aria-pressed", on ? "true" : "false");
+  if (textBtn && textBtn.getAttribute("data-bound") !== "shell") {
+    function applyTextSize() {
+      const on = localStorage.getItem("ovpt-large-text") === "1";
+      document.documentElement.classList.toggle("large-text", on);
+      textBtn.setAttribute("aria-pressed", on ? "true" : "false");
+    }
+    textBtn.addEventListener("click", function () {
+      const next = localStorage.getItem("ovpt-large-text") === "1" ? "0" : "1";
+      localStorage.setItem("ovpt-large-text", next);
+      applyTextSize();
+    });
+    applyTextSize();
   }
 
-  textBtn.addEventListener("click", function () {
-    const next = localStorage.getItem("ovpt-large-text") === "1" ? "0" : "1";
-    localStorage.setItem("ovpt-large-text", next);
-    applyTextSize();
-  });
-  applyTextSize();
+  if (!engine || !moc || !occ || !phrases || !meta) {
+    output.replaceChildren();
+    const err = document.createElement("p");
+    err.className = "state state-error";
+    err.setAttribute("role", "alert");
+    err.textContent = "The career files on this page did not load. Reload once while online. After that, the saved copy can open offline.";
+    output.append(err);
+    return;
+  }
+  const boot = document.getElementById("boot");
+  if (boot) boot.remove();
 
   function h(tag, attrs, children) {
     const node = document.createElement(tag);
@@ -34,8 +47,25 @@
     return node;
   }
 
-  function p(text) {
-    return h("p", { text: text });
+  function p(text, className) {
+    return h("p", { class: className || "", text: text });
+  }
+
+  function renderHistory() {
+    const slot = document.getElementById("history");
+    if (!slot) return;
+    let history = [];
+    try { history = JSON.parse(localStorage.getItem("ovpt-career-history") || "[]"); } catch (err) { history = []; }
+    slot.replaceChildren();
+    if (!history.length) {
+      slot.append(p("No codes saved on this browser yet. A successful lookup is kept here, on this device only.", "state state-empty"));
+      return;
+    }
+    const list = h("ul");
+    history.forEach(function (item) {
+      list.append(h("li", { text: (item.branch ? item.branch + " " : "") + item.code + " — " + item.title }));
+    });
+    slot.append(list);
   }
 
   function fillRanks() {
@@ -78,6 +108,7 @@
         at: Date.now(),
       });
       localStorage.setItem("ovpt-career-history", JSON.stringify(history.slice(0, 8)));
+      renderHistory();
     } catch (err) {
       /* Private mode can block storage. The translation still works. */
     }
@@ -208,12 +239,12 @@
     const heading = h("h2", { id: "results-heading", tabindex: "-1", text: "Results" });
     output.append(heading);
     if (!found.ok && found.reason === "short") {
-      output.append(p("Enter at least two characters of a code or title."));
+      output.append(p("Enter at least two characters of a code or title.", "state state-empty"));
       heading.focus();
       return;
     }
     if (found.mode === "obsolete-hidden") {
-      output.append(p("No active code matched. " + found.obsoleteHidden + " obsolete record(s) match. Turn on “Include obsolete codes” if you left service under an older code."));
+      output.append(p("No active code matched. " + found.obsoleteHidden + " obsolete record(s) match. Turn on “Include obsolete codes” if you left service under an older code.", "state state-empty"));
       found.obsoletePreview.forEach(function (record) {
         output.append(p(record.branchLabel + " " + record.code + " — " + record.title));
       });
@@ -221,7 +252,7 @@
       return;
     }
     if (!found.results.length) {
-      output.append(p("No military code or title in this offline file matched. Try the code without spaces, pick a branch, or describe the duty in the second box."));
+      output.append(p("No military code or title in this offline file matched. Try the code without spaces, pick a branch, or describe the duty in the second box.", "state state-empty"));
       if (dutyText) output.append(renderDutyOnly(dutyText));
       heading.focus();
       return;
@@ -244,10 +275,10 @@
           class: "secondary",
           text: record.branchLabel + " · " + record.code + " · " + record.title + (record.active ? "" : " · obsolete"),
         });
-        button.style.display = "block";
         button.style.width = "100%";
         button.style.textAlign = "left";
         button.style.marginBottom = "0.5rem";
+        button.setAttribute("aria-expanded", "false");
         const slot = h("div");
         button.addEventListener("click", function () {
           slot.replaceChildren(renderRecord(record, dutyText));
@@ -294,7 +325,7 @@
       heading.focus();
       return;
     }
-    output.append(p("Enter a code, a title, or a duty description."));
+    output.append(p("Enter a code, a title, or a duty description.", "state state-empty"));
   });
 
   document.getElementById("rank-form").addEventListener("submit", function (event) {
@@ -303,7 +334,7 @@
     const found = engine.rankLookup(phrases, document.getElementById("rank-branch").value, document.getElementById("rank-grade").value);
     slot.replaceChildren();
     if (!found.length) {
-      slot.append(p("Choose a branch and pay grade."));
+      slot.append(p("Choose a branch and pay grade.", "state state-empty"));
       return;
     }
     found.forEach(function (row) {
@@ -318,10 +349,11 @@
 
   document.getElementById("clear-history").addEventListener("click", function () {
     localStorage.removeItem("ovpt-career-history");
-    document.getElementById("history").textContent = "Search history cleared from this browser.";
+    renderHistory();
   });
 
   const about = document.getElementById("about-counts");
   about.textContent = meta.mocRows + " military records (" + meta.mocActive + " active) from DMDC " + meta.mocFile + ", " + meta.occupations + " O*NET 31.0 occupations, and " + meta.curated + " Debriefed code notes. Debriefed commit " + meta.debriefedCommit + ".";
   fillRanks();
+  renderHistory();
 })();

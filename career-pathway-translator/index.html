@@ -4,25 +4,36 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+  <meta name="theme-color" content="#111111">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Pathways">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
   <title>Career Pathway Translator</title>
+  <link rel="icon" href="../icons/favicon-32.png" type="image/png">
+  <link rel="apple-touch-icon" href="../icons/icon-180.png">
+  <link rel="manifest" href="../manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
-    <div class="brand-bar"></div>
+    <div class="brand-bar" aria-hidden="true"></div>
     <div class="header-inner">
       <div>
-        <p>Open Veteran Pathways Toolkit</p>
+        <p class="wordmark">Open Veteran Pathways</p>
         <h1>Career Pathway Translator</h1>
-        <p>Look up a code or duty description on this device. Nothing is uploaded.</p>
+        <p class="lede">Look up a code or duty description on this device. Nothing is uploaded.</p>
       </div>
-      <button type="button" class="ghost" id="text-size" aria-pressed="false">Larger text</button>
+      <div class="header-actions">
+        <button type="button" class="ghost" id="text-size" aria-pressed="false">Larger text</button>
+        <button type="button" class="ghost" id="theme" aria-pressed="false">Dark theme</button>
+        <button type="button" class="ghost" id="install" hidden>Install</button>
+      </div>
     </div>
   </header>
   <nav class="wrap tool-nav" aria-label="Toolkit">
-    <a href="../index.html" aria-current="page">Home</a>
+    <a href="../index.html">Home</a>
     <a href="../scam-guardian/index.html">Scam Guardian</a>
     <a href="../ai-tutor/index.html">AI Tutor</a>
     <a href="../transition-companion/index.html">Transition Companion</a>
@@ -49,7 +60,10 @@
         <button type="submit">Look up</button>
       </form>
     </section>
-    <div id="output" aria-live="polite"></div>
+    <div id="output" aria-live="polite">
+      <p class="state state-loading" id="boot">Loading the career files stored with this page.</p>
+      <p class="state state-empty" id="empty-state">Enter a code or a title, then choose Look up. Nothing you type is sent to a server.</p>
+    </div>
     <section class="panel">
       <h2>Pay grade wording</h2>
       <p>A separate Debriefed table suggests civilian scope language for pay grades. It does not convert a rank into a civilian job title.</p>
@@ -66,16 +80,18 @@
         </div>
         <button type="submit" class="secondary">Show rank wording</button>
       </form>
-      <div id="rank-output"></div>
+      <div id="rank-output" aria-live="polite">
+        <p class="state state-empty">Choose a branch and a pay grade to read scope wording. Nothing is saved from this form except what you already stored in this browser.</p>
+      </div>
     </section>
     <section class="panel">
       <h2>What this file contains</h2>
-      <p id="about-counts"></p>
+      <p id="about-counts">Counts appear when the local files finish loading.</p>
       <p>Military codes and O*NET-SOC links are from the Defense Manpower Data Center crosswalk distributed by the O*NET Resource Center. Occupation descriptions, skills, sample titles, and job-zone text are from the O*NET 31.0 Database by the U.S. Department of Labor, Employment and Training Administration, used under CC BY 4.0. This toolkit shortened the database to those fields and dropped rows that were not needed for this lookup. USDOL/ETA has not approved, endorsed, or tested these modifications. O*NET® is a trademark of USDOL/ETA.</p>
       <p>Handbook links are from the BLS Occupational Outlook Handbook crosswalk. Resume phrases, curated civilian titles, jargon, acronyms, and rank wording are from Debriefed by Chris Simser, MIT License, commit 7d75063a4d816ab615cdfbe8868045490837f725.</p>
       <p>Some official links point at military O*NET occupations, especially infantry codes in group 55. Those records describe the service job. Dictionary titles beside them are suggestions for a human to review. Additional skill identifiers, prefixes, Navy AQDs, and similar add-on codes are not in this offline file. Primary enlisted, warrant, and officer codes for the six branches are.</p>
       <p><button type="button" class="secondary" id="clear-history">Clear code history on this browser</button></p>
-      <p id="history"></p>
+      <div id="history" aria-live="polite"></div>
     </section>
   </main>
   <footer>
@@ -83,6 +99,7 @@
       <p>The AI Cowboys Foundation is a Texas 501(c)(3) in San Antonio. This tool is not affiliated with, endorsed by, or part of the Department of Defense, the Department of Veterans Affairs, or any other government agency. Outputs are for human review. They are not legal, medical, financial, benefits, or employment advice. Never enter classified information, Controlled Unclassified Information (CUI), protected health information, Social Security numbers, or other sensitive personal information. Everything on this page runs in your browser. The page does not send your text to a server.</p>
     </div>
   </footer>
+  <script src="../shared/shell.js"></script>
   <script src="data/meta.js"></script>
   <script src="data/moc.js"></script>
   <script src="data/occupations.js"></script>

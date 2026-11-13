@@ -90,12 +90,65 @@ const ordinary = scam.modelScore(model.OVPT_SPAM_MODEL, "See you at the clinic o
 check("sms model separates classic spam wording", spamLike.probability > ordinary.probability && spamLike.flagged);
 
 const tutor = loadAssign(path.join(root, "ai-tutor/data/content.js"), ["OVPT_TUTOR"]);
-check("glossary size", tutor.OVPT_TUTOR.glossary.length >= 30);
-check("lessons and quizzes", tutor.OVPT_TUTOR.lessons.length >= 6 && tutor.OVPT_TUTOR.lessons.every(function (lesson) {
-  return lesson.quiz.length >= 3 && lesson.quiz.every(function (item) {
-    return item.answer >= 0 && item.answer < item.choices.length && item.why;
-  });
+const tutorData = tutor.OVPT_TUTOR;
+const quizCount = tutorData.lessons.reduce(function (sum, lesson) { return sum + lesson.quiz.length; }, 0);
+check("glossary size", tutorData.glossary.length >= 80, String(tutorData.glossary.length));
+check("lesson count", tutorData.lessons.length >= 12, String(tutorData.lessons.length));
+check("quiz count", quizCount >= 60, String(quizCount));
+const sourceHosts = {
+  "nvlpubs.nist.gov": true,
+  "www.nist.gov": true,
+  "nist.gov": true,
+  "www.ftc.gov": true,
+  "consumer.ftc.gov": true,
+  "reportfraud.ftc.gov": true,
+  "www.va.gov": true,
+  "benefits.va.gov": true,
+  "www.benefits.va.gov": true,
+  "www.vaoig.gov": true,
+  "www.cisa.gov": true,
+  "www.ic3.gov": true,
+  "www.fbi.gov": true,
+  "www.dol.gov": true,
+  "www.onetcenter.org": true,
+  "www.onetonline.org": true,
+  "www.careeronestop.org": true,
+  "www.mynextmove.org": true,
+  "www.bls.gov": true,
+  "arxiv.org": true,
+  "doi.org": true,
+  "dl.acm.org": true,
+  "www.w3.org": true,
+  "developer.mozilla.org": true,
+  "genai.owasp.org": true,
+  "owasp.org": true,
+  "www.eeoc.gov": true,
+  "www.identitytheft.gov": true,
+  "web.stanford.edu": true,
+  "archive.ics.uci.edu": true,
+};
+function sourceOk(url) {
+  if (!url || !/^https:\/\//.test(url)) return false;
+  try {
+    return !!sourceHosts[new URL(url).hostname];
+  } catch (err) {
+    return false;
+  }
+}
+check("glossary sources", tutorData.glossary.every(function (item) {
+  return item.term && item.plain && item.example && sourceOk(item.source);
 }));
+check("lesson sources and quizzes", tutorData.lessons.every(function (lesson) {
+  const lessonSources = (lesson.sources || []).every(function (source) { return sourceOk(source.href) && source.name; });
+  const quizzes = lesson.quiz.length >= 5 && lesson.quiz.every(function (item) {
+    return item.answer >= 0 && item.answer < item.choices.length && item.why && sourceOk(item.source);
+  });
+  return lessonSources && quizzes && lesson.body && lesson.body.length >= 3;
+}));
+const tutorText = fs.readFileSync(path.join(root, "ai-tutor/data/content.js"), "utf8");
+check("tutor invents no percentages", !/\d+(\.\d+)?\s*%/.test(tutorText));
+check("tutor avoids forbidden names", !/RODEO|MagenTrust|Centargus|InvisibleSignal|Military AI Agents|\bC2H\b/.test(tutorText));
+check("tutor does not say the scam tool detects deepfakes", !/Scam Guardian (detects|identifies|catches) deepfakes/i.test(tutorText));
 
 const plan = loadAssign(path.join(root, "transition-companion/data/plan.js"), ["OVPT_PLAN"]);
 const ids = [];
@@ -136,6 +189,59 @@ check("ocr is local", scamHtml.indexOf("vendor/tesseract/tesseract.min.js") !== 
   check("vendor " + file, fs.existsSync(path.join(root, "scam-guardian/vendor/tesseract", file)));
 });
 check("debriefed license file", fs.readFileSync(path.join(root, "career-pathway-translator/vendor/debriefed/LICENSE"), "utf8").indexOf("Chris Simser") !== -1);
+
+const manifest = JSON.parse(fs.readFileSync(path.join(root, "manifest.webmanifest"), "utf8"));
+check("manifest relative start", manifest.start_url === "./" && manifest.scope === "./");
+check("manifest icons", manifest.icons.some(function (icon) { return icon.sizes === "192x192"; }) && manifest.icons.some(function (icon) { return icon.sizes === "512x512" && icon.purpose === "maskable"; }));
+["icons/icon-192.png", "icons/icon-512.png", "icons/icon-180.png", "icons/icon-maskable-512.png", "icons/favicon-32.png"].forEach(function (file) {
+  check("icon " + file, fs.existsSync(path.join(root, file)) && fs.statSync(path.join(root, file)).size > 50);
+});
+
+const sw = fs.readFileSync(path.join(root, "sw.js"), "utf8");
+check("versioned cache", /var CACHE = "ovpt-static-v\d+"/.test(sw) && sw.indexOf("caches.delete") !== -1);
+check("update message", sw.indexOf("skip-waiting") !== -1);
+const precache = [];
+const arrayMatch = sw.match(/var PRECACHE = \[([\s\S]*?)\];/);
+check("precache list", Boolean(arrayMatch));
+if (arrayMatch) {
+  arrayMatch[1].split("\n").forEach(function (line) {
+    const found = line.match(/"([^"]+)"/);
+    if (found) precache.push(found[1]);
+  });
+}
+[
+  "career-pathway-translator/data/moc.js",
+  "career-pathway-translator/data/occupations.js",
+  "scam-guardian/data/model.js",
+  "scam-guardian/vendor/tesseract/worker.min.js",
+  "scam-guardian/vendor/tesseract/eng.traineddata.gz",
+  "scam-guardian/vendor/tesseract/core/tesseract-core-lstm.wasm.js",
+  "scam-guardian/vendor/tesseract/core/tesseract-core-simd-lstm.wasm.js",
+  "scam-guardian/vendor/tesseract/core/tesseract-core-relaxedsimd-lstm.wasm.js",
+  "ai-tutor/data/content.js",
+  "shared/shell.js",
+  "manifest.webmanifest",
+].forEach(function (file) {
+  check("precache includes " + file, precache.indexOf(file) !== -1);
+});
+precache.forEach(function (file) {
+  check("precache file exists " + file, fs.existsSync(path.join(root, file)));
+});
+check("service worker stays relative", !/https?:\/\/|^\s*["']\//m.test(arrayMatch ? arrayMatch[1] : ""));
+
+["index.html", "career-pathway-translator/index.html", "scam-guardian/index.html", "ai-tutor/index.html", "transition-companion/index.html"].forEach(function (file) {
+  const html = fs.readFileSync(path.join(root, file), "utf8");
+  check(file + " manifest link", /rel="manifest" href="(\.\.\/)?manifest\.webmanifest"/.test(html));
+  check(file + " shell script", /src="(\.\.\/)?shared\/shell\.js"/.test(html));
+  check(file + " no root-relative assets", !/(?:href|src)="\/(?!\/)/.test(html));
+  check(file + " one wordmark", (html.match(/class="wordmark"/g) || []).length === 1);
+  check(file + " theme control", html.indexOf('id="theme"') !== -1 && html.indexOf('id="install"') !== -1);
+});
+check("ocr progress markup", fs.readFileSync(path.join(root, "scam-guardian/index.html"), "utf8").indexOf('role="progressbar"') !== -1);
+check("tutor export control", fs.readFileSync(path.join(root, "ai-tutor/index.html"), "utf8").indexOf('id="export-progress"') !== -1);
+const shell = fs.readFileSync(path.join(root, "shared/shell.js"), "utf8");
+check("shell registers relative worker", shell.indexOf('new URL("sw.js"') !== -1 && shell.indexOf("Add to Home Screen") !== -1);
+check("pages workflow still deploys", fs.readFileSync(path.join(root, ".github/workflows/pages.yml"), "utf8").indexOf("actions/deploy-pages@v4") !== -1);
 
 if (failed) {
   console.error(failed + " checks failed");

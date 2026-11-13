@@ -19,9 +19,17 @@ Thanks for improving a tool that people may trust with a career story or a scary
 node scripts/verify.mjs
 ```
 
-That script checks known military codes, scam fixtures, glossary and quiz shape, checklist ids, local CSS, and the absence of remote fetches in the page scripts.
+That script checks known military codes, scam fixtures, glossary and quiz shape, source links on tutor claims, checklist ids, local CSS, the manifest, the offline file list, and the absence of remote fetches in the page scripts.
 
-If you change what a person sees, also open the page with a local static server and use the control you changed. Screenshot OCR needs that server. Pasted text can be checked from `file://` as well.
+Browser checks, including a 360px viewport and a reload with the network off:
+
+```bash
+npm ci
+npx playwright install chromium
+npx playwright test
+```
+
+If you change what a person sees, also open the page with a local static server and use the control you changed. Screenshot OCR, installation, and the service worker need that server. Pasted text can be checked from `file://` as well.
 
 ## Refreshing data
 

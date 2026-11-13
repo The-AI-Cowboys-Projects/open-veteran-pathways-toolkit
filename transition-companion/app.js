@@ -6,16 +6,31 @@
   const textBtn = document.getElementById("text-size");
   const KEY = "ovpt-companion-v1";
 
-  function applyTextSize() {
-    const on = localStorage.getItem("ovpt-large-text") === "1";
-    document.documentElement.classList.toggle("large-text", on);
-    textBtn.setAttribute("aria-pressed", on ? "true" : "false");
-  }
-  textBtn.addEventListener("click", function () {
-    localStorage.setItem("ovpt-large-text", localStorage.getItem("ovpt-large-text") === "1" ? "0" : "1");
+  if (textBtn && textBtn.getAttribute("data-bound") !== "shell") {
+    function applyTextSize() {
+      const on = localStorage.getItem("ovpt-large-text") === "1";
+      document.documentElement.classList.toggle("large-text", on);
+      textBtn.setAttribute("aria-pressed", on ? "true" : "false");
+    }
+    textBtn.addEventListener("click", function () {
+      localStorage.setItem("ovpt-large-text", localStorage.getItem("ovpt-large-text") === "1" ? "0" : "1");
+      applyTextSize();
+    });
     applyTextSize();
-  });
-  applyTextSize();
+  }
+
+  const importError = document.getElementById("import-error");
+  function showImportError(message) {
+    if (!importError) {
+      summary.textContent = message;
+      return;
+    }
+    importError.hidden = false;
+    importError.textContent = message;
+  }
+  function clearImportError() {
+    if (importError) importError.hidden = true;
+  }
 
   function load() {
     try {
@@ -50,6 +65,18 @@
     return node;
   }
 
+  if (!plan || !plan.phases) {
+    list.replaceChildren();
+    const err = document.createElement("p");
+    err.className = "state state-error";
+    err.setAttribute("role", "alert");
+    err.textContent = "The checklist file did not load. Reload once while online. After that, the saved copy can open offline.";
+    list.append(err);
+    summary.className = "state state-error";
+    summary.textContent = "Checklist progress cannot be shown until the local file loads.";
+    return;
+  }
+
   function render() {
     const state = load();
     dateInput.value = state.date;
@@ -59,8 +86,9 @@
       phase.items.forEach(function (item) { items.push(item.id); });
     });
     const done = items.filter(function (id) { return state.checks[id]; }).length;
+    summary.className = "state" + (done === 0 && months === null ? " state-empty" : "");
     summary.textContent = done + " of " + items.length + " steps checked on this browser."
-      + (months === null ? " Add a separation date if you want the current window highlighted." : " About " + months + " month(s) until the date you entered (negative means that date has passed).");
+      + (months === null ? " Add a separation date if you want the current window highlighted. No date is stored until you enter one." : " About " + months + " month(s) until the date you entered (negative means that date has passed).");
 
     list.replaceChildren();
     plan.phases.forEach(function (phase) {
@@ -128,13 +156,14 @@
       try {
         const parsed = JSON.parse(String(reader.result || "{}"));
         if (!parsed || typeof parsed !== "object" || typeof parsed.checks !== "object") {
-          summary.textContent = "That file is not a checklist backup from this page.";
+          showImportError("That file is not a checklist backup from this page.");
           return;
         }
+        clearImportError();
         save({ date: typeof parsed.date === "string" ? parsed.date : "", checks: parsed.checks });
         render();
       } catch (err) {
-        summary.textContent = "Could not read that file as JSON.";
+        showImportError("Could not read that file as JSON.");
       }
     };
     reader.readAsText(file);

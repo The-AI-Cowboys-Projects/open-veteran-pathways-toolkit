@@ -4,21 +4,32 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+  <meta name="theme-color" content="#111111">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Pathways">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
   <title>Transition Companion</title>
+  <link rel="icon" href="../icons/favicon-32.png" type="image/png">
+  <link rel="apple-touch-icon" href="../icons/icon-180.png">
+  <link rel="manifest" href="../manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
-    <div class="brand-bar"></div>
+    <div class="brand-bar" aria-hidden="true"></div>
     <div class="header-inner">
       <div>
-        <p>Open Veteran Pathways Toolkit</p>
+        <p class="wordmark">Open Veteran Pathways</p>
         <h1>Transition Companion</h1>
-        <p>A checklist for the months before and after separation. Checks stay in this browser.</p>
+        <p class="lede">A checklist for the months before and after separation. Checks stay in this browser.</p>
       </div>
-      <button type="button" class="ghost" id="text-size" aria-pressed="false">Larger text</button>
+      <div class="header-actions">
+        <button type="button" class="ghost" id="text-size" aria-pressed="false">Larger text</button>
+        <button type="button" class="ghost" id="theme" aria-pressed="false">Dark theme</button>
+        <button type="button" class="ghost" id="install" hidden>Install</button>
+      </div>
     </div>
   </header>
   <nav class="wrap tool-nav" aria-label="Toolkit">
@@ -32,7 +43,7 @@
       <p>For service members, veterans, and family members helping them. The steps are reminders to read official pages and to use the other tools in this folder. They are not a separation order, a benefits decision, or a TAP completion certificate.</p>
       <label for="separation-date">Separation or retirement date (stored only on this device)</label>
       <input id="separation-date" type="date">
-      <p id="summary" aria-live="polite"></p>
+      <p id="summary" class="state state-loading" aria-live="polite">Loading the checklist stored with this page.</p>
       <div class="row">
         <button type="button" class="secondary" id="export">Download a backup file</button>
         <div>
@@ -40,9 +51,12 @@
           <input id="import" type="file" accept="application/json,.json">
         </div>
       </div>
+      <p id="import-error" class="state state-error" role="alert" hidden></p>
       <p><button type="button" class="secondary" id="reset">Clear checklist on this browser</button></p>
     </section>
-    <div id="list"></div>
+    <div id="list">
+      <p class="state state-empty" id="list-empty">Checklist steps appear here after the local file loads. If this note stays, reload once while online.</p>
+    </div>
     <section class="panel">
       <h2>What is stored</h2>
       <p>Checked boxes and the date live in this browser’s localStorage under a key used only by this page. Download a backup if you want a copy you can move. There is no account. Links to VA, DoD, DOL, BLS partners, SBA, FTC, and IC3 open only when you choose them.</p>
@@ -54,6 +68,7 @@
       <p>The AI Cowboys Foundation is a Texas 501(c)(3) in San Antonio. This tool is not affiliated with, endorsed by, or part of the Department of Defense, the Department of Veterans Affairs, or any other government agency. Outputs are for human review. They are not legal, medical, financial, benefits, or employment advice. Never enter classified information, Controlled Unclassified Information (CUI), protected health information, Social Security numbers, or other sensitive personal information. Everything on this page runs in your browser. The page does not send your checklist to a server.</p>
     </div>
   </footer>
+  <script src="../shared/shell.js"></script>
   <script src="data/plan.js"></script>
   <script src="app.js"></script>
 </body>

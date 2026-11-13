@@ -4,21 +4,32 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+  <meta name="theme-color" content="#111111">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Pathways">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
   <title>Plain-English AI Tutor</title>
+  <link rel="icon" href="../icons/favicon-32.png" type="image/png">
+  <link rel="apple-touch-icon" href="../icons/icon-180.png">
+  <link rel="manifest" href="../manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
-    <div class="brand-bar"></div>
+    <div class="brand-bar" aria-hidden="true"></div>
     <div class="header-inner">
       <div>
-        <p>Open Veteran Pathways Toolkit</p>
+        <p class="wordmark">Open Veteran Pathways</p>
         <h1>Plain-English AI Tutor</h1>
-        <p>A short glossary, six lessons, and quizzes. Written for this toolkit. Stored on this device.</p>
+        <p class="lede">Lessons, a glossary, and quizzes. Written for this toolkit. Stored on this device.</p>
       </div>
-      <button type="button" class="ghost" id="text-size" aria-pressed="false">Larger text</button>
+      <div class="header-actions">
+        <button type="button" class="ghost" id="text-size" aria-pressed="false">Larger text</button>
+        <button type="button" class="ghost" id="theme" aria-pressed="false">Dark theme</button>
+        <button type="button" class="ghost" id="install" hidden>Install</button>
+      </div>
     </div>
   </header>
   <nav class="wrap tool-nav" aria-label="Toolkit">
@@ -29,22 +40,37 @@
   </nav>
   <main id="main" class="wrap">
     <section class="panel">
+      <h2>Your progress on this browser</h2>
+      <p id="progress-summary" class="state state-loading" aria-live="polite">Loading lesson progress stored on this device.</p>
+      <div id="progress-meter" class="progress" hidden>
+        <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="progress-summary"></div>
+      </div>
+      <div class="row">
+        <button type="button" id="export-progress">Download progress</button>
+        <button type="button" class="secondary" id="clear-progress">Clear lesson progress on this browser</button>
+      </div>
+    </section>
+    <section class="panel">
       <h2>Glossary</h2>
       <label for="q">Search the glossary</label>
       <input id="q" type="search" placeholder="Try prompt, hallucination, privacy, phishing">
-      <div id="glossary"></div>
+      <div id="glossary">
+        <p class="state state-loading" id="glossary-boot">Loading glossary entries stored with this page.</p>
+      </div>
     </section>
     <section class="panel">
       <h2>Lessons</h2>
-      <p>Read in order if you are new to these words. The quizzes stay in this browser under the key the page uses for progress. They are not sent anywhere.</p>
-      <div id="lessons"></div>
-      <p><button type="button" class="secondary" id="clear-progress">Clear lesson progress on this browser</button></p>
+      <p>Read in order if you are new to these words. Quizzes stay in this browser. They are not sent anywhere. Each lesson links the public source behind its factual claims.</p>
+      <div id="lessons">
+        <p class="state state-loading" id="lessons-boot">Loading lessons stored with this page.</p>
+      </div>
     </section>
-    <div id="reader"></div>
+    <div id="reader" aria-live="polite"></div>
     <section class="panel">
       <h2>Where the words come from</h2>
-      <p>The lessons and glossary entries were written for the Open Veteran Pathways Toolkit by The AI Cowboys Foundation. They are original teaching text, not a copy of a commercial course and not an official DoD or VA curriculum. Definitions are plain-language explanations for veterans, military families, and older adults. They are not technical standards.</p>
-      <p>There are 36 glossary entries and 6 lessons. A quiz score means you matched this answer key. It is not a certificate.</p>
+      <p id="tutor-counts">Counts appear when the lesson file loads.</p>
+      <p>The lessons and glossary entries were written for the Open Veteran Pathways Toolkit by The AI Cowboys Foundation. They are original teaching text, not a copy of a commercial course and not an official DoD or VA curriculum. Definitions are plain-language explanations for veterans, military families, and older adults. They are not technical standards. A factual claim points at a public source such as NIST, FTC, VA, the Department of Labor, CISA, or a published paper. Open the link. The lesson is not a substitute for that page.</p>
+      <p>A quiz score means you matched this answer key. It is not a certificate. Scam Guardian, linked from the lessons about fraud and synthetic media, does not detect deepfakes.</p>
     </section>
   </main>
   <footer>
@@ -52,6 +78,7 @@
       <p>The AI Cowboys Foundation is a Texas 501(c)(3) in San Antonio. This tool is not affiliated with, endorsed by, or part of the Department of Defense, the Department of Veterans Affairs, or any other government agency. Outputs are for human review. They are not legal, medical, financial, benefits, or employment advice. Never enter classified information, Controlled Unclassified Information (CUI), protected health information, Social Security numbers, or other sensitive personal information. Everything on this page runs in your browser. The page does not send your answers to a server.</p>
     </div>
   </footer>
+  <script src="../shared/shell.js"></script>
   <script src="data/content.js"></script>
   <script src="app.js"></script>
 </body>
