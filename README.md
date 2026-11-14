@@ -2,22 +2,32 @@
 
 **Built by The AI Cowboys**
 
+The Open Veteran Pathways Toolkit is a free, open-source set of tools from The AI Cowboys Foundation. It helps veterans, military families, and older adults translate military experience into civilian career language, learn plain-English habits for using AI, and follow a separation checklist that points to official public pages on education and benefits. The pages are static files. After they load, lookups, quizzes, and checklists run in the browser. There is no account, no analytics, and no call that sends what you type to a server. After one online visit, the same files can open again with the network off.
+
 The AI Cowboys Foundation, [www.theaicowboysfoundation.org](https://www.theaicowboysfoundation.org), a veteran-owned AI lab in San Antonio. The Foundation is a Texas 501(c)(3).
 
-Open-source tools for veterans, military families, and older adults.
+The Foundation is not part of the Department of Defense or the Department of Veterans Affairs. Nothing here is legal, medical, financial, benefits, or employment advice.
 
-The pages are static files. After they load, lookups, quizzes, and checklists run in the browser. There is no account, no analytics, and no call that sends what you type to a server. The Foundation is not part of the Department of Defense or the Department of Veterans Affairs. Nothing here is legal, medical, financial, benefits, or employment advice.
+Open the toolkit on the Foundation site at [www.theaicowboysfoundation.org/learn/open-veteran-pathways](https://www.theaicowboysfoundation.org/learn/open-veteran-pathways), or on GitHub Pages at [the-ai-cowboys-projects.github.io/open-veteran-pathways-toolkit](https://the-ai-cowboys-projects.github.io/open-veteran-pathways-toolkit/). The source code is at [github.com/The-AI-Cowboys-Projects/open-veteran-pathways-toolkit](https://github.com/The-AI-Cowboys-Projects/open-veteran-pathways-toolkit).
 
 This repository is public so it can be reviewed. It does not report a grant award, a user count, or a partnership that is not in the git history.
 
+## Grant status
+
+Submitted to the Sentient Foundation Open Source AGI Grant (Grant track) on November 13, 2026 at 9:14 PM CT.
+
 ## Tools
 
-| Tool | What it does now | Offline data |
+These four tools are everything in this repository. Each live link below is the tool page itself.
+
+| Tool | What it does | Live pages |
 | --- | --- | --- |
-| [Career Pathway Translator](career-pathway-translator/index.html) | Search an Army, Navy, Air Force, Marine Corps, Coast Guard, or Space Force code or title. Read the DMDC crosswalk, O*NET 31.0 title, description, skills, and sample civilian titles. A separate box translates pasted bullets with the military-to-civilian phrase dictionary. | 26,883 military rows (13,513 active), 1,016 occupations, 8,361 phrase-dictionary rows. |
-| [Scam Guardian](scam-guardian/index.html) | Paste a message, or read a screenshot with local OCR, and see which written scam rules matched. A second point rubric is another reading. An optional Gemma model can be downloaded later. It does not detect deepfakes. | 14 rules plus a 10 KiB SMS model. OCR runtime is about 14.2 MiB. The optional model is not in the repository. |
-| [Plain-English AI Tutor](ai-tutor/index.html) | 12 original lessons, 95 glossary entries, and 64 quiz questions with explanations. A question box shows matching passages from those lessons. An optional on-device model can phrase an answer only from those passages. | Original text in the page. |
-| [Transition Companion](transition-companion/index.html) | 32-step checklist from 24 months before separation through the first civilian year. Links the other tools and official public pages. A date highlights the closest window. | Checklist in the page. Checks live in `localStorage`. |
+| Career Pathway Translator | Search an Army, Navy, Air Force, Marine Corps, Coast Guard, or Space Force code or title and read the DMDC crosswalk, O*NET 31.0 title, description, skills, and sample civilian titles stored with the page. A separate box rewords pasted bullets with the military-to-civilian phrase dictionary, and nothing you type is uploaded. | [Foundation site](https://www.theaicowboysfoundation.org/learn/open-veteran-pathways/career-pathway-translator/index.html) · [GitHub Pages](https://the-ai-cowboys-projects.github.io/open-veteran-pathways-toolkit/career-pathway-translator/index.html) · [In this repo](career-pathway-translator/index.html) |
+| Scam Guardian | Paste a message, or read a screenshot with local OCR, and see which written scam rules matched. A point rubric is a second reading, an optional on-device model can be downloaded later, and the page does not detect deepfakes. | [Foundation site](https://www.theaicowboysfoundation.org/learn/open-veteran-pathways/scam-guardian/index.html) · [GitHub Pages](https://the-ai-cowboys-projects.github.io/open-veteran-pathways-toolkit/scam-guardian/index.html) · [In this repo](scam-guardian/index.html) |
+| Plain-English AI Tutor | Twelve original lessons, 95 glossary entries, and 64 quiz questions explain how to use AI carefully, and each factual claim links a public source. A question box shows matching passages from those lessons, and an optional on-device model can phrase an answer only from those passages. | [Foundation site](https://www.theaicowboysfoundation.org/learn/open-veteran-pathways/ai-tutor/index.html) · [GitHub Pages](https://the-ai-cowboys-projects.github.io/open-veteran-pathways-toolkit/ai-tutor/index.html) · [In this repo](ai-tutor/index.html) |
+| Transition Companion | A 32-step checklist runs from 24 months before separation through the first civilian year and links the other tools plus official public pages on careers, education, and benefits. An optional date highlights the closest window, and checked boxes stay in this browser. | [Foundation site](https://www.theaicowboysfoundation.org/learn/open-veteran-pathways/transition-companion/index.html) · [GitHub Pages](https://the-ai-cowboys-projects.github.io/open-veteran-pathways-toolkit/transition-companion/index.html) · [In this repo](transition-companion/index.html) |
+
+The career file holds 26,883 military rows (13,513 active), 1,016 occupations, and 8,361 phrase-dictionary rows. Scam Guardian ships 14 rules plus a 10 KiB SMS model. Its OCR runtime is about 14.2 MiB. The optional model is not in the repository. The tutor text and the checklist are in the pages. Companion checks live in `localStorage`.
 
 Each folder has its own `index.html` and can be copied into a site’s public directory. Paths between tools, styles, the manifest, and the service worker are relative, so the same files work on GitHub Pages and under a subpath such as `/learn/open-veteran-pathways/`. Keep the four folders and the repository root side by side if you want the installable offline copy. A single tool folder still runs its own page. The install button and the shared offline cache live with the full set of files.
 
