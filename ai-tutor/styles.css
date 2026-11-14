@@ -217,6 +217,7 @@ main { padding: 1rem 0 2.5rem; }
 
 a {
   color: var(--link);
+  overflow-wrap: anywhere;
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 0.15em;
